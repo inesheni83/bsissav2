@@ -2,7 +2,7 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
-import { dashboardSeller } from '@/routes/index';
+import { dashboardSeller } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
 import { create as createProductRoute } from '@/actions/App/Http/Controllers/Product/AddProductController';
 import { NavItem, type BreadcrumbItem, type SharedData } from '@/types';

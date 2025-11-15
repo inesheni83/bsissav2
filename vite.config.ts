@@ -20,7 +20,7 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
         },
-        extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
     },
     esbuild: {
         jsx: 'automatic',

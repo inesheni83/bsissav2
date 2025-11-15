@@ -14,7 +14,7 @@ import {
     User,
     X,
 } from 'lucide-react';
-import { dashboardSeller, home, login, logout } from '@/routes/index';
+import { dashboardSeller, home, login, logout } from '@/routes';
 import type { SharedData } from '@/types';
 
 type MenuLink = {
