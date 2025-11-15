@@ -1,0 +1,373 @@
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+/**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+export const edit = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: edit.url(args, options),
+    method: 'get',
+})
+
+edit.definition = {
+    methods: ["get","head"],
+    url: '/products/{product}/edit',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+edit.url = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { product: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { product: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    product: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        product: typeof args.product === 'object'
+                ? args.product.id
+                : args.product,
+                }
+
+    return edit.definition.url
+            .replace('{product}', parsedArgs.product.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+edit.get = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: edit.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+edit.head = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: edit.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+    const editForm = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: edit.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+        editForm.get = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: edit.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Product\ProductController::edit
+ * @see app/Http/Controllers/Product/ProductController.php:24
+ * @route '/products/{product}/edit'
+ */
+        editForm.head = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: edit.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    edit.form = editForm
+/**
+* @see \App\Http\Controllers\Product\ProductController::update
+ * @see app/Http/Controllers/Product/ProductController.php:40
+ * @route '/products/{product}'
+ */
+export const update = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
+    method: 'put',
+})
+
+update.definition = {
+    methods: ["put"],
+    url: '/products/{product}',
+} satisfies RouteDefinition<["put"]>
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::update
+ * @see app/Http/Controllers/Product/ProductController.php:40
+ * @route '/products/{product}'
+ */
+update.url = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { product: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { product: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    product: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        product: typeof args.product === 'object'
+                ? args.product.id
+                : args.product,
+                }
+
+    return update.definition.url
+            .replace('{product}', parsedArgs.product.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::update
+ * @see app/Http/Controllers/Product/ProductController.php:40
+ * @route '/products/{product}'
+ */
+update.put = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: update.url(args, options),
+    method: 'put',
+})
+
+    /**
+* @see \App\Http\Controllers\Product\ProductController::update
+ * @see app/Http/Controllers/Product/ProductController.php:40
+ * @route '/products/{product}'
+ */
+    const updateForm = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Product\ProductController::update
+ * @see app/Http/Controllers/Product/ProductController.php:40
+ * @route '/products/{product}'
+ */
+        updateForm.put = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
+/**
+* @see \App\Http\Controllers\Product\ProductController::destroy
+ * @see app/Http/Controllers/Product/ProductController.php:87
+ * @route '/products/{product}'
+ */
+export const destroy = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+destroy.definition = {
+    methods: ["delete"],
+    url: '/products/{product}',
+} satisfies RouteDefinition<["delete"]>
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::destroy
+ * @see app/Http/Controllers/Product/ProductController.php:87
+ * @route '/products/{product}'
+ */
+destroy.url = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { product: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { product: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    product: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        product: typeof args.product === 'object'
+                ? args.product.id
+                : args.product,
+                }
+
+    return destroy.definition.url
+            .replace('{product}', parsedArgs.product.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::destroy
+ * @see app/Http/Controllers/Product/ProductController.php:87
+ * @route '/products/{product}'
+ */
+destroy.delete = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+    /**
+* @see \App\Http\Controllers\Product\ProductController::destroy
+ * @see app/Http/Controllers/Product/ProductController.php:87
+ * @route '/products/{product}'
+ */
+    const destroyForm = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Product\ProductController::destroy
+ * @see app/Http/Controllers/Product/ProductController.php:87
+ * @route '/products/{product}'
+ */
+        destroyForm.delete = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
+/**
+* @see \App\Http\Controllers\Product\ProductController::toggleFeatured
+ * @see app/Http/Controllers/Product/ProductController.php:107
+ * @route '/products/{product}/toggle-featured'
+ */
+export const toggleFeatured = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: toggleFeatured.url(args, options),
+    method: 'patch',
+})
+
+toggleFeatured.definition = {
+    methods: ["patch"],
+    url: '/products/{product}/toggle-featured',
+} satisfies RouteDefinition<["patch"]>
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::toggleFeatured
+ * @see app/Http/Controllers/Product/ProductController.php:107
+ * @route '/products/{product}/toggle-featured'
+ */
+toggleFeatured.url = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { product: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { product: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    product: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        product: typeof args.product === 'object'
+                ? args.product.id
+                : args.product,
+                }
+
+    return toggleFeatured.definition.url
+            .replace('{product}', parsedArgs.product.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Product\ProductController::toggleFeatured
+ * @see app/Http/Controllers/Product/ProductController.php:107
+ * @route '/products/{product}/toggle-featured'
+ */
+toggleFeatured.patch = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+    url: toggleFeatured.url(args, options),
+    method: 'patch',
+})
+
+    /**
+* @see \App\Http\Controllers\Product\ProductController::toggleFeatured
+ * @see app/Http/Controllers/Product/ProductController.php:107
+ * @route '/products/{product}/toggle-featured'
+ */
+    const toggleFeaturedForm = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: toggleFeatured.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PATCH',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Product\ProductController::toggleFeatured
+ * @see app/Http/Controllers/Product/ProductController.php:107
+ * @route '/products/{product}/toggle-featured'
+ */
+        toggleFeaturedForm.patch = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: toggleFeatured.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    toggleFeatured.form = toggleFeaturedForm
+const ProductController = { edit, update, destroy, toggleFeatured }
+
+export default ProductController
