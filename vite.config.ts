@@ -15,6 +15,9 @@ export default defineConfig({
         // Plugin Wayfinder temporairement désactivé pour éviter les conflits
         // avec les contrôleurs d'authentification à deux facteurs
     ],
+    resolve: {
+        extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
+    },
     esbuild: {
         jsx: 'automatic',
     },
