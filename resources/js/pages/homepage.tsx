@@ -1,7 +1,7 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { ArrowRight, Package, Search, ShoppingCart, SlidersHorizontal, Star, X, Leaf, Sparkles, Heart, Users } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { home } from '@/routes';
+import { home } from '@/routes/index';
 import PublicLayout from '@/layouts/public-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Package } from 'lucide-react';
 import PublicLayout from '@/layouts/public-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { home } from '@/routes';
+import { home } from '@/routes/index';
 
 interface OrderItem {
     product_id: number | null;
