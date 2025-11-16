@@ -51,7 +51,12 @@ Ce dossier contient toute la documentation nécessaire pour déployer et mainten
    - Assets chargés en HTTP au lieu de HTTPS
    - Forcer HTTPS en production
 
-7. **[API_KEY_GUIDE.md](API_KEY_GUIDE.md)**
+7. **[RAILWAY_STORAGE_FIX.md](RAILWAY_STORAGE_FIX.md)**
+   - 📦 Erreur 404 pour les fichiers de storage
+   - Images de produits non trouvées
+   - Création du lien symbolique storage
+
+8. **[API_KEY_GUIDE.md](API_KEY_GUIDE.md)**
    - Génération de clés API personnalisées
    - Différents types de clés
    - Scripts de génération
@@ -124,7 +129,34 @@ APP_ENV=production
 
 ---
 
-### Problème Fréquent 4 : Base de données vide
+### Problème Fréquent 4 : Images 404 - Storage Files Not Found
+
+**Erreur** :
+```
+GET /storage/products/hero-bsissa.png 404 (Not Found)
+```
+
+**Solution** :
+```toml
+# nixpacks.toml - Ajouter dans [phases.build]
+"php artisan storage:link"
+```
+
+**Committer les images de démo** :
+```bash
+# Modifier storage/app/public/.gitignore
+!products/hero-bsissa.png
+
+# Forcer l'ajout
+git add -f storage/app/public/products/hero-bsissa.png
+git push
+```
+
+**Voir** : [RAILWAY_STORAGE_FIX.md](RAILWAY_STORAGE_FIX.md)
+
+---
+
+### Problème Fréquent 5 : Base de données vide
 
 **Solution** :
 ```bash
