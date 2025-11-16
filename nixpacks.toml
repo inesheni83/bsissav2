@@ -1,15 +1,31 @@
 [phases.setup]
 nixPkgs = ["nodejs_20", "php82", "php82Packages.composer"]
 
-[phases.build]
+[phases.install]
 cmds = [
-  "composer install --no-dev --optimize-autoloader",
-  "npm ci",
-  "npm run build"
+  "composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist"
 ]
 
-[phases.deploy]
-cmds = ["php artisan config:cache", "php artisan route:cache", "php artisan view:cache"]
+[phases.build]
+cmds = [
+  # Installer les dépendances (y compris dev pour vite)
+  "npm ci --include=dev",
+
+  # Builder les assets
+  "npm run build",
+
+  # Permissions
+  "chmod -R 755 public/build",
+  "chmod -R 775 storage bootstrap/cache",
+
+  # Cache Laravel
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache"
+]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
+
+[variables]
+NODE_ENV = "production"
