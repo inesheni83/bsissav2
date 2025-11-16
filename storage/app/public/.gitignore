@@ -1,4 +1,6 @@
 *
 !.gitignore
 !products/
-!products/hero-bsissa.png
+!products/*.png
+!products/*.jpg
+!products/*.jpeg
