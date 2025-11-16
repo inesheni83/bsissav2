@@ -1,25 +1,8 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class('light')>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
-        <script>
-            (function() {
-                const appearance = '{{ $appearance ?? "light" }}';
-alert(appearance);
-                if (appearance === 'dark') {
-                    document.documentElement.classList.add('light');
-                } else if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: light)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('light');
-                    }
-                }
-            })();
-        </script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>

@@ -18,8 +18,8 @@ cmds = [
   "chmod -R 755 public/build",
   "chmod -R 775 storage bootstrap/cache",
 
-  # Storage link
-  "php artisan storage:link",
+  # Storage link (force recreation if exists)
+  "php artisan storage:link --force || true",
 
   # Clear all caches first
   "php artisan config:clear",
