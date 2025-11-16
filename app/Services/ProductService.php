@@ -24,7 +24,11 @@ class ProductService
     {
         return DB::transaction(function () use ($data, $image) {
             if ($image) {
-                $data['image'] = $this->handleImageUpload($image);
+                // Save image to database as base64
+                $imageData = $this->convertImageToBase64($image);
+                $data['image'] = $this->handleImageUpload($image); // Keep path for backwards compatibility
+                $data['image_data'] = $imageData['base64'];
+                $data['image_mime_type'] = $imageData['mime_type'];
             }
 
             // Extract weight variants data before creating product
@@ -49,13 +53,20 @@ class ProductService
     {
         return DB::transaction(function () use ($product, $data, $image) {
             if ($image instanceof UploadedFile) {
+                // Delete old image file if exists
                 if ($product->image && Storage::disk('public')->exists($product->image)) {
                     Storage::disk('public')->delete($product->image);
                 }
 
-                $data['image'] = $image->store('products', 'public');
+                // Save new image to database as base64
+                $imageData = $this->convertImageToBase64($image);
+                $data['image'] = $image->store('products', 'public'); // Keep path for backwards compatibility
+                $data['image_data'] = $imageData['base64'];
+                $data['image_mime_type'] = $imageData['mime_type'];
             } else {
                 unset($data['image']);
+                unset($data['image_data']);
+                unset($data['image_mime_type']);
             }
 
             // Extract weight variants data before updating product
@@ -113,6 +124,21 @@ class ProductService
         $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
         return $image->storeAs('products', $filename, 'public');
+    }
+
+    /**
+     * Convert an uploaded image to base64 for database storage.
+     */
+    private function convertImageToBase64(UploadedFile $image): array
+    {
+        $imageContent = file_get_contents($image->getRealPath());
+        $base64 = base64_encode($imageContent);
+        $mimeType = $image->getMimeType();
+
+        return [
+            'base64' => $base64,
+            'mime_type' => $mimeType,
+        ];
     }
 
     /**

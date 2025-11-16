@@ -18,6 +18,8 @@ class Product extends Model
         'description',
         'detailed_description',
         'image',
+        'image_data',         // Base64 encoded image
+        'image_mime_type',    // Image MIME type
         'category_id',
         'is_featured',
 
@@ -133,5 +135,24 @@ class Product extends Model
     public function getMaxPriceAttribute(): ?float
     {
         return $this->weightVariants()->max('price');
+    }
+
+    /**
+     * Get the image URL. Returns base64 data URI if image_data exists,
+     * otherwise returns the file path.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        // Priority 1: Use base64 image from database if available
+        if ($this->image_data && $this->image_mime_type) {
+            return 'data:' . $this->image_mime_type . ';base64,' . $this->image_data;
+        }
+
+        // Priority 2: Use file path if available
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+
+        return null;
     }
 }
