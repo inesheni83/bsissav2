@@ -27,6 +27,9 @@ cmds = [
   "php artisan view:clear",
   "php artisan cache:clear",
 
+  # Run database migrations
+  "php artisan migrate --force",
+
   # Rebuild caches
   "php artisan config:cache",
   "php artisan route:cache",
