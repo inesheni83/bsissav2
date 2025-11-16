@@ -17,7 +17,7 @@ class HandleAppearance
     public function handle(Request $request, Closure $next): Response
     {
         // Default to 'light' in production, 'system' in other environments
-        $defaultAppearance = app()->environment('production') ? 'light' : 'system';
+        $defaultAppearance = app()->environment('production') ? 'light' : 'light';
 
         View::share('appearance', $request->cookie('appearance') ?? $defaultAppearance);
 
