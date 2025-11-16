@@ -10,12 +10,12 @@
                 const appearance = '{{ $appearance ?? "light" }}';
 alert(appearance);
                 if (appearance === 'dark') {
-                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.add('light');
                 } else if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: light)').matches;
 
                     if (prefersDark) {
-                        document.documentElement.classList.add('dark');
+                        document.documentElement.classList.add('light');
                     }
                 }
             })();
