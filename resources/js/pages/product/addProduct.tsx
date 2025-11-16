@@ -55,10 +55,10 @@ export default function AddProduct() {
 
         submitForm(event, route('product.add.store'), 'post', {
             preserveScroll: true,
-            onSuccess: () => {alert('ok');
+            onSuccess: () => {
                 console.log('Product created successfully!');
             },
-            onError: (errors: any) => {alert('error' + errors);
+            onError: (errors: any) => {
                 console.error('Form submission errors:', errors);
             }
         });
