@@ -18,6 +18,9 @@ cmds = [
   "chmod -R 755 public/build",
   "chmod -R 775 storage bootstrap/cache",
 
+  # Storage link
+  "php artisan storage:link",
+
   # Cache Laravel
   "php artisan config:cache",
   "php artisan route:cache",
