@@ -8,7 +8,7 @@
         <script>
             (function() {
                 const appearance = '{{ $appearance ?? "light" }}';
-
+alert(appearance);
                 if (appearance === 'dark') {
                     document.documentElement.classList.add('dark');
                 } else if (appearance === 'system') {
