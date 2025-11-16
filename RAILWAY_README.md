@@ -46,7 +46,12 @@ Ce dossier contient toute la documentation nécessaire pour déployer et mainten
    - Assets Vite non chargés
    - Solutions et dépannage
 
-6. **[API_KEY_GUIDE.md](API_KEY_GUIDE.md)**
+6. **[RAILWAY_HTTPS_FIX.md](RAILWAY_HTTPS_FIX.md)**
+   - 🔒 Erreur "Mixed Content" (HTTP/HTTPS)
+   - Assets chargés en HTTP au lieu de HTTPS
+   - Forcer HTTPS en production
+
+7. **[API_KEY_GUIDE.md](API_KEY_GUIDE.md)**
    - Génération de clés API personnalisées
    - Différents types de clés
    - Scripts de génération
@@ -92,7 +97,34 @@ ASSET_URL=https://votre-app.up.railway.app
 
 ---
 
-### Problème Fréquent 3 : Base de données vide
+### Problème Fréquent 3 : Mixed Content - Assets en HTTP au lieu de HTTPS
+
+**Erreur** :
+```
+Mixed Content: The page at 'https://...' was loaded over HTTPS,
+but requested an insecure stylesheet 'http://...'
+```
+
+**Solution** :
+```php
+// app/Providers/AppServiceProvider.php
+if ($this->app->environment('production')) {
+    \Illuminate\Support\Facades\URL::forceScheme('https');
+}
+```
+
+**Ajouter sur Railway** :
+```env
+APP_URL=https://votre-app.up.railway.app  # HTTPS!
+ASSET_URL=https://votre-app.up.railway.app  # HTTPS!
+APP_ENV=production
+```
+
+**Voir** : [RAILWAY_HTTPS_FIX.md](RAILWAY_HTTPS_FIX.md)
+
+---
+
+### Problème Fréquent 4 : Base de données vide
 
 **Solution** :
 ```bash

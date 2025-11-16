@@ -27,5 +27,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Category::class, CategoryPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
+
+        // Force HTTPS in production (Railway, Heroku, etc.)
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }
