@@ -16,7 +16,10 @@ class HandleAppearance
      */
     public function handle(Request $request, Closure $next): Response
     {
-        View::share('appearance', $request->cookie('appearance') ?? 'system');
+        // Default to 'light' in production, 'system' in other environments
+        $defaultAppearance = app()->environment('production') ? 'light' : 'system';
+
+        View::share('appearance', $request->cookie('appearance') ?? $defaultAppearance);
 
         return $next($request);
     }
