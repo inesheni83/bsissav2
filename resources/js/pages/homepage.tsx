@@ -27,6 +27,7 @@ type Product = {
     name: string;
     description: string;
     image: string | null;
+    image_url?: string | null;
     price: number | string;
     promotional_price?: number | string | null;
     category?: Category | null;
@@ -355,7 +356,7 @@ export default function Homepage({ products, categories, filters }: HomePageProp
                                                     <Link href={`/products/${product.id}`} className="relative block bg-[#8C4B1F]">
                                                         {product.image_url ? (
                                                             <img
-                                                                src={`product.image_url_url`}
+                                                                src={product.image_url}
                                                                 alt={product.name}
                                                                 className="w-full h-64 object-cover transition-transform duration-500 hover:scale-105"
                                                             />
