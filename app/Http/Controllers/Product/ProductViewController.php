@@ -25,6 +25,7 @@ class ProductViewController extends Controller
                 'slug' => $relatedProduct->slug,
                 'description' => $relatedProduct->description,
                 'image' => $relatedProduct->image,
+                'image_url' => $relatedProduct->image_url,
                 'is_featured' => $relatedProduct->is_featured,
                 'weight_variants' => $relatedProduct->weightVariants->map(fn($variant) => [
                     'id' => $variant->id,
@@ -45,6 +46,7 @@ class ProductViewController extends Controller
                 'detailed_description' => $product->detailed_description,
                 'ingredients' => $product->ingredients,
                 'image' => $product->image,
+                'image_url' => $product->image_url,
                 'category' => $product->category?->only(['id', 'name']),
                 'is_featured' => $product->is_featured,
                 'weight_variants' => $product->weightVariants->map(fn($variant) => [
