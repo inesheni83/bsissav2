@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\GalleryImage;
 use App\Models\Product;
 use App\Policies\CategoryPolicy;
+use App\Policies\GalleryImagePolicy;
 use App\Policies\ProductPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Category::class, CategoryPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
+        Gate::policy(GalleryImage::class, GalleryImagePolicy::class);
 
         // Force HTTPS in production (Railway, Heroku, etc.)
         if ($this->app->environment('production')) {

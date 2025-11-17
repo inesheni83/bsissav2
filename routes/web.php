@@ -15,6 +15,7 @@ use App\Http\Controllers\Order\AdminOrderController;
 use App\Http\Controllers\Product\ProductViewController;
 use App\Http\Controllers\Invoice\InvoiceController;
 use App\Http\Controllers\DeliveryFee\DeliveryFeeController;
+use App\Http\Controllers\GalleryImage\GalleryImageController;
 use App\Http\Controllers\SellerDashboardController;
 use App\Http\Controllers\Settings\SiteSettingsController;
 use App\Http\Controllers\Customer\CustomerController;
@@ -74,6 +75,14 @@ Route::middleware(['auth', 'verified', 'admin.vendeur'])->group(function () {
     Route::get('/admin/delivery-fees/{deliveryFee}/edit', [DeliveryFeeController::class, 'edit'])->name('admin.delivery-fees.edit');
     Route::put('/admin/delivery-fees/{deliveryFee}', [DeliveryFeeController::class, 'update'])->name('admin.delivery-fees.update');
     Route::delete('/admin/delivery-fees/{deliveryFee}', [DeliveryFeeController::class, 'destroy'])->name('admin.delivery-fees.destroy');
+
+    // Admin gallery images management routes
+    Route::get('/admin/gallery-images', [GalleryImageController::class, 'index'])->name('gallery-images.index');
+    Route::get('/admin/gallery-images/create', [GalleryImageController::class, 'create'])->name('gallery-images.create');
+    Route::post('/admin/gallery-images', [GalleryImageController::class, 'store'])->name('gallery-images.store');
+    Route::get('/admin/gallery-images/{galleryImage}/edit', [GalleryImageController::class, 'edit'])->name('gallery-images.edit');
+    Route::put('/admin/gallery-images/{galleryImage}', [GalleryImageController::class, 'update'])->name('gallery-images.update');
+    Route::delete('/admin/gallery-images/{galleryImage}', [GalleryImageController::class, 'destroy'])->name('gallery-images.destroy');
 
     // Admin customers management routes
     Route::get('/admin/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
