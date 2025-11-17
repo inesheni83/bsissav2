@@ -239,9 +239,9 @@ export default function DashboardSeller({ stats }: DashboardSellerProps) {
                                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">
                                                     #{index + 1}
                                                 </div>
-                                                {product.image ? (
+                                                {product.image_url ? (
                                                     <img
-                                                        src={`/storage/${product.image}`}
+                                                        src={`product.image_url_url`}
                                                         alt={product.name}
                                                         className="h-12 w-12 rounded-lg object-cover"
                                                     />
@@ -286,9 +286,9 @@ export default function DashboardSeller({ stats }: DashboardSellerProps) {
                                     <div className="space-y-4">
                                         {stats.low_stock_products.map((product) => (
                                             <div key={product.id} className="flex items-center gap-4 rounded-lg border border-red-200 bg-red-50 p-3">
-                                                {product.image ? (
+                                                {product.image_url ? (
                                                     <img
-                                                        src={`/storage/${product.image}`}
+                                                        src={`product.image_url_url`}
                                                         alt={product.name}
                                                         className="h-12 w-12 rounded-lg object-cover"
                                                     />

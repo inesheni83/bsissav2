@@ -89,8 +89,8 @@ export default function ProductShow({ product, relatedProducts }: ProductShowPro
 
                 <div className="grid gap-8 lg:grid-cols-2 items-start">
                     <div className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
-                        {product.image ? (
-                            <img src={`/storage/${product.image}`} alt={product.name} className="h-[420px] w-full object-cover" />
+                        {product.image_url ? (
+                            <img src={product.image_url} alt={product.name} className="h-[420px] w-full object-cover" />
                         ) : (
                             <div className="flex h-[420px] w-full items-center justify-center bg-emerald-50 text-emerald-300 text-6xl">🛍️</div>
                         )}

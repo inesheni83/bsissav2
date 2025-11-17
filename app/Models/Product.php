@@ -57,6 +57,21 @@ class Product extends Model
     ];
 
     /**
+     * Accessors to append to JSON serialization.
+     */
+    protected $appends = [
+        'image_url',
+    ];
+
+    /**
+     * Hidden attributes (not included in JSON by default).
+     * image_data is heavy, only use image_url accessor instead.
+     */
+    protected $hidden = [
+        'image_data',
+    ];
+
+    /**
      * Relations
      */
     public function category(): BelongsTo

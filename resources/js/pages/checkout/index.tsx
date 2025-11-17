@@ -185,8 +185,8 @@ export default function CheckoutPage({ items, summary, deliveryFee, delivery, re
                             {items.map((item) => (
                                 <div key={item.id} className="grid gap-4 p-6 sm:grid-cols-[auto_1fr_auto]">
                                     <div className="h-20 w-20 overflow-hidden rounded-xl bg-emerald-50">
-                                        {item.product.image ? (
-                                            <img src={`/storage/${item.product.image}`} alt={item.product.name} className="h-full w-full object-cover" />
+                                        {item.product.image_url_url ? (
+                                            <img src={`/storage/${item.product.image_url_url}`} alt={item.product.name} className="h-full w-full object-cover" />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center text-emerald-300">
                                                 <Package className="w-8 h-8" />

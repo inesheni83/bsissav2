@@ -353,9 +353,9 @@ export default function Homepage({ products, categories, filters }: HomePageProp
                                                     className="flex flex-col rounded-[28px] overflow-hidden shadow-[0_35px_65px_-30px_rgba(40,40,40,0.45)] bg-white transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-[0_45px_80px_-40px_rgba(40,40,40,0.5)]"
                                                 >
                                                     <Link href={`/products/${product.id}`} className="relative block bg-[#8C4B1F]">
-                                                        {product.image ? (
+                                                        {product.image_url ? (
                                                             <img
-                                                                src={`/storage/${product.image}`}
+                                                                src={`product.image_url_url`}
                                                                 alt={product.name}
                                                                 className="w-full h-64 object-cover transition-transform duration-500 hover:scale-105"
                                                             />

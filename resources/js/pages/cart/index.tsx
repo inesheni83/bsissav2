@@ -149,9 +149,9 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                         <div key={item.id} className="rounded-2xl border border-emerald-100 bg-white shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
                                             <div className="grid grid-cols-[auto_1fr_auto] gap-4 p-6">
                                                 <div>
-                                                    {item.product.image ? (
+                                                    {item.product.image_url_url ? (
                                                         <img
-                                                            src={`/storage/${item.product.image}`}
+                                                            src={`/storage/${item.product.image_url_url}`}
                                                             alt={item.product.name}
                                                             className="h-24 w-24 rounded-xl object-cover"
                                                         />
