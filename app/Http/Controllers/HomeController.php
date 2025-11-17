@@ -38,6 +38,7 @@ class HomeController extends Controller
                 'name' => $product->name,
                 'description' => $product->description,
                 'image' => $product->image,
+                'image_url' => $product->image_url,
                 'price' => (float) $product->price,
                 'promotional_price' => $product->promotional_price ? (float) $product->promotional_price : null,
                 'category' => $product->category?->only(['id', 'name']),
