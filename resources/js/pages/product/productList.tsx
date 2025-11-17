@@ -32,6 +32,7 @@ type Product = {
     slug: string;
     description: string;
     image: string | null;
+    image_url?: string | null;
     category_id: number | null;
     is_featured: boolean;
     created_at: string;
@@ -382,7 +383,7 @@ function ProductCard({ product, toggleFeatured, handleDelete }: ProductCardProps
         <article className="group relative flex flex-col overflow-hidden rounded-[28px] border border-emerald-100 bg-white text-emerald-950 shadow-[0_35px_80px_-45px_rgba(15,118,110,0.45)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_45px_95px_-55px_rgba(15,118,110,0.55)]">
             <div className="relative bg-gradient-to-br from-emerald-100 via-emerald-50 to-white">
                 {product.image_url ? (
-                    <img src={`product.image_url_url`} alt={product.name} className="h-48 w-full object-cover transition duration-500 group-hover:scale-105" />
+                    <img src={product.image_url} alt={product.name} className="h-48 w-full object-cover transition duration-500 group-hover:scale-105" />
                 ) : (
                     <div className="flex h-48 w-full items-center justify-center bg-emerald-50">
                         <Package className="h-12 w-12 text-emerald-400/70" />

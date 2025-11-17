@@ -29,7 +29,10 @@ interface WysiwygEditorProps {
 export function WysiwygEditor({ value, onChange, placeholder, className }: WysiwygEditorProps) {
     const editor = useEditor({
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                // Disable link extension from StarterKit since we configure it separately
+                link: false,
+            }),
             Link.configure({
                 openOnClick: false,
             }),

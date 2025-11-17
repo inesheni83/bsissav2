@@ -154,7 +154,7 @@ class Product extends Model
 
     /**
      * Get the image URL. Returns base64 data URI if image_data exists,
-     * otherwise returns the file path.
+     * otherwise returns the file path (only if file exists).
      */
     public function getImageUrlAttribute(): ?string
     {
@@ -163,8 +163,8 @@ class Product extends Model
             return 'data:' . $this->image_mime_type . ';base64,' . $this->image_data;
         }
 
-        // Priority 2: Use file path if available
-        if ($this->image) {
+        // Priority 2: Use file path if available AND file exists
+        if ($this->image && \Storage::disk('public')->exists($this->image)) {
             return asset('storage/' . $this->image);
         }
 
