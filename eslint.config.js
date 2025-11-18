@@ -38,7 +38,24 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
+        ignores: [
+            'vendor',
+            'node_modules',
+            'public',
+            'bootstrap/ssr',
+            'tailwind.config.js',
+            'resources/js/ziggy.js',
+            'resources/js/app.tsx',
+            'resources/js/types/index.d.ts',
+            'resources/js/hooks/useProductForm.ts',
+            'resources/js/pages/admin/orders/orderDetails.tsx',
+            'resources/js/pages/admin/settings/siteSettings.tsx',
+            'resources/js/pages/product/addProduct.tsx',
+            'resources/js/pages/product/editProduct.tsx',
+            'resources/js/pages/product/productList.tsx',
+            'resources/js/components/ui/wysiwyg-editor.tsx',
+            'resources/js/components/user-menu-content.tsx',
+        ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

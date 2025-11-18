@@ -174,7 +174,7 @@ export default function Homepage({ products, categories, galleryImages, filters 
                 </div>
             </form>
         ),
-        [data.search, data.category_id, data.in_stock, categories, submitFilters, clearFilters],
+        [data.search, data.category_id, data.in_stock, categories, submitFilters, clearFilters, setData],
     );
 
     return (
