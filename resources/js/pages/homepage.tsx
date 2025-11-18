@@ -3,6 +3,7 @@ import { ArrowRight, Package, Search, ShoppingCart, SlidersHorizontal, Star, X, 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { home } from '@/routes';
 import PublicLayout from '@/layouts/public-layout';
+import HeroCarousel from '@/components/hero-carousel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,17 +46,20 @@ type Paginator<T> = {
     links: Array<{ url: string | null; label: string; active: boolean }>;
 };
 
+type GalleryImage = {
+    id: number;
+    name: string;
+    image_url: string | null;
+};
+
 type HomePageProps = {
     products: Paginator<Product>;
     categories: Category[];
+    galleryImages: GalleryImage[];
     filters: { search?: string; category_id?: string | number; featured?: string; in_stock?: string };
 };
 
-const HERO_IMAGES = ['/storage/products/hero-bsissa.png', '/images/bsissa-hero.jpg', '/storage/bsissa-hero.png', '/storage/bsissa-hero.jpg'];
-
-export default function Homepage({ products, categories, filters }: HomePageProps) {
-    const [heroIndex, setHeroIndex] = useState(0);
-    const heroSrc = HERO_IMAGES[heroIndex];
+export default function Homepage({ products, categories, galleryImages, filters }: HomePageProps) {
     const [quantities, setQuantities] = useState<Record<number, number>>(() =>
         products.data.reduce<Record<number, number>>((acc, product) => {
             acc[product.id] = 1;
@@ -93,10 +97,6 @@ export default function Homepage({ products, categories, filters }: HomePageProp
     const clearFilters = () => {
         setData({ search: '', category_id: '', featured: '', in_stock: '' });
         get(home().url, { preserveState: true, preserveScroll: true });
-    };
-
-    const handleHeroError = () => {
-        setHeroIndex((index) => (index < HERO_IMAGES.length - 1 ? index + 1 : index));
     };
 
     const updateQuantity = (productId: number, value: number) => {
@@ -213,12 +213,10 @@ export default function Homepage({ products, categories, filters }: HomePageProp
                 <div className="max-w-none">
                     <section className="relative isolate min-h-[70vh] md:min-h-[80vh]">
                         <div className="absolute inset-0 -z-10">
-                            <img
-                                src={heroSrc}
-                                onError={handleHeroError}
-                                alt="Ingredients de la Bsissa et bols rustiques"
-                                className="h-full w-full object-cover"
-                                loading="eager"
+                            <HeroCarousel
+                                images={galleryImages}
+                                autoPlayInterval={5000}
+                                className="h-full"
                             />
                             <div className="absolute inset-0 bg-neutral-950/60" />
                         </div>

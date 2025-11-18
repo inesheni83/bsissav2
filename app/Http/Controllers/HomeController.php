@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ProductService;
 use App\Services\SiteSettingsService;
 use App\Models\Category;
+use App\Models\GalleryImage;
 use App\Http\Requests\HomeFilterRequest;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -60,12 +61,26 @@ class HomeController extends Controller
             return Category::orderBy('name')->get(['id', 'name']);
         });
 
+        // Récupérer les images de la galerie pour le carrousel hero
+        $galleryImages = Cache::remember('home_gallery_images', 60, function () {
+            return GalleryImage::ordered()
+                ->get()
+                ->map(function ($image) {
+                    return [
+                        'id' => $image->id,
+                        'name' => $image->name,
+                        'image_url' => $image->image_url,
+                    ];
+                });
+        });
+
         $siteSettings = $this->siteSettingsService->getSettings();
 
         return Inertia::render('homepage', [
             'products' => $products,
             'categories' => $categories,
             'filters' => $filters,
+            'galleryImages' => $galleryImages,
             'siteSettings' => [
                 'site_name' => $siteSettings->site_name,
                 'contact_email' => $siteSettings->contact_email,
