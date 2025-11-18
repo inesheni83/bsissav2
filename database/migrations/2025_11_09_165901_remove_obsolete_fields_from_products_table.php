@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
+            // Drop the index first before dropping the column
+            $table->dropIndex('products_stock_idx');
             $table->dropColumn(['price', 'promotional_price', 'weight_kg', 'stock_quantity']);
         });
     }
@@ -26,6 +28,8 @@ return new class extends Migration
             $table->decimal('promotional_price', 10, 2)->nullable()->after('price');
             $table->decimal('weight_kg', 10, 2)->nullable()->after('promotional_price');
             $table->integer('stock_quantity')->default(0)->after('is_featured');
+            // Recreate the index
+            $table->index('stock_quantity', 'products_stock_idx');
         });
     }
 };
