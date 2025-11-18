@@ -21,12 +21,13 @@ type PageProps = {
 export default function AddProduct() {
     const { props } = usePage<PageProps>();
     const categories = props.categories ?? [];
+    const pageErrors = props.errors || {};
 
     const {
         data,
         setData,
         processing,
-        errors,
+        errors: formErrors,
         autoSlug,
         setAutoSlug,
         imagePreview,
@@ -36,6 +37,9 @@ export default function AddProduct() {
         submitForm,
         slugify,
     } = useProductForm();
+
+    // Utiliser les erreurs de la page Inertia plutôt que celles du formulaire
+    const errors = Object.keys(pageErrors).length > 0 ? pageErrors : formErrors;
 
     const [isDragging, setIsDragging] = useState(false);
 
@@ -147,16 +151,28 @@ export default function AddProduct() {
                     <div className="space-y-6">
                         {/* Afficher les erreurs globales s'il y en a */}
                         {Object.keys(errors).length > 0 && (
-                            <Card className="border-red-200 bg-red-50">
-                                <CardContent className="p-4">
-                                    <h3 className="font-semibold text-red-900 mb-2">Erreurs de validation :</h3>
-                                    <ul className="list-disc list-inside text-sm text-red-700">
-                                        {Object.entries(errors).map(([field, error]) => (
-                                            <li key={field}><strong>{field}:</strong> {error}</li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
+                            <div className="rounded-lg border-2 border-red-300 bg-red-50 p-4 shadow-sm" role="alert">
+                                <div className="flex items-start gap-3">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-base font-semibold text-red-900 mb-2">
+                                            Veuillez corriger les erreurs suivantes :
+                                        </h3>
+                                        <ul className="space-y-1 text-sm text-red-800">
+                                            {Object.entries(errors).map(([field, error]) => (
+                                                <li key={field} className="flex items-start gap-2">
+                                                    <span className="text-red-600 mt-0.5">•</span>
+                                                    <span><strong className="font-medium">{field}:</strong> {error}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                         {/* Basic Information */}
                         <Card className="overflow-hidden border-slate-200 bg-white shadow-sm">
@@ -284,7 +300,7 @@ export default function AddProduct() {
                                 <WeightVariantManager
                                     variants={data.weight_variants}
                                     onChange={(variants) => setData('weight_variants', variants)}
-                                    errors={errors}
+                                    errors={errors as Record<string, string>}
                                 />
                             </CardContent>
                         </Card>

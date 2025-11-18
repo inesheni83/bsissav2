@@ -31,24 +31,7 @@ export interface ProductFormData {
   weight_variants: ProductWeightVariant[];
 }
 
-export interface ProductFormErrors {
-  name?: string;
-  slug?: string;
-  description?: string;
-  detailed_description?: string;
-  ingredients?: string;
-  marketing_tags?: string;
-  image?: string;
-  category_id?: string;
-  is_featured?: string;
-  calories_kcal?: string;
-  protein_g?: string;
-  carbs_g?: string;
-  fat_g?: string;
-  fiber_g?: string;
-  weight_variants?: string;
-  [key: `weight_variants.${number}.${string}`]: string;
-}
+export type ProductFormErrors = Partial<Record<string, string>>
 
 export interface NutritionalInfo {
   calories_kcal: string;

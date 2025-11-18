@@ -139,11 +139,14 @@ export function useProductForm() {
     // Toujours utiliser router.post() car forceFormData ne fonctionne pas avec put()
     router.post(routeName, payload, {
       forceFormData: true,
-      preserveState: false,
-      preserveScroll: false,
+      preserveState: (page) => Object.keys(page.props.errors || {}).length > 0,
+      preserveScroll: (page) => Object.keys(page.props.errors || {}).length > 0,
       ...restOptions,
       onError: (formErrors: any) => {
         console.error('Submission errors:', formErrors);
+        console.log('All errors:', formErrors);
+        // Force scroll to top to show error message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         onError?.(formErrors);
       },
       onSuccess: (page: any) => {
