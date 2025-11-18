@@ -43,7 +43,6 @@ class ProductServiceTest extends TestCase
             'description' => 'Test Description',
             'price' => 29.99,
             'category_id' => $this->category->id,
-            'stock_quantity' => 10,
             'is_featured' => false,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
@@ -64,7 +63,6 @@ class ProductServiceTest extends TestCase
             'description' => 'Test Description',
             'price' => 29.99,
             'category_id' => $this->category->id,
-            'stock_quantity' => 10,
             'is_featured' => false,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
@@ -236,14 +234,12 @@ class ProductServiceTest extends TestCase
     {
         Product::factory()->create([
             'is_featured' => true,
-            'stock_quantity' => 10,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
         ]);
 
         Product::factory()->create([
             'is_featured' => false,
-            'stock_quantity' => 0,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
         ]);

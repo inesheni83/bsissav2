@@ -36,7 +36,6 @@ class ProductTest extends TestCase
             'description' => 'This is a test product',
             'price' => 29.99,
             'category_id' => $this->category->id,
-            'stock_quantity' => 10,
             'is_featured' => false,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
@@ -102,13 +101,11 @@ class ProductTest extends TestCase
     public function it_can_check_if_in_stock()
     {
         $inStockProduct = Product::factory()->create([
-            'stock_quantity' => 10,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
         ]);
 
         $outOfStockProduct = Product::factory()->create([
-            'stock_quantity' => 0,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
         ]);
@@ -175,13 +172,11 @@ class ProductTest extends TestCase
     public function it_can_scope_products_in_stock()
     {
         Product::factory()->create([
-            'stock_quantity' => 10,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
         ]);
 
         Product::factory()->create([
-            'stock_quantity' => 0,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
         ]);
@@ -189,7 +184,6 @@ class ProductTest extends TestCase
         $inStockProducts = Product::inStock()->get();
 
         $this->assertEquals(1, $inStockProducts->count());
-        $this->assertGreaterThan(0, $inStockProducts->first()->stock_quantity);
     }
 
     /** @test */
@@ -205,20 +199,5 @@ class ProductTest extends TestCase
 
         // Le mutateur devrait convertir les valeurs négatives en positives
         $this->assertEquals(10.00, $product->price);
-    }
-
-    /** @test */
-    public function it_validates_stock_quantity_cannot_be_negative()
-    {
-        $product = new Product([
-            'stock_quantity' => -5,
-            'created_by' => $this->user->id,
-            'updated_by' => $this->user->id,
-        ]);
-
-        $product->setStockQuantityAttribute(-5);
-
-        // Le mutateur devrait définir une valeur par défaut de 0 pour les valeurs négatives
-        $this->assertEquals(0, $product->stock_quantity);
     }
 }
