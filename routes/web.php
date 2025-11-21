@@ -35,6 +35,10 @@ Route::get('/test-auth', function () {
 // Public product detail route (accessible to all) - MUST use 'product' prefix to avoid conflicts
 Route::get('/product/{product}', [ProductViewController::class, 'show'])->name('products.show');
 
+// Public pack routes (accessible to all)
+Route::get('/packs', [\App\Http\Controllers\Pack\PackViewController::class, 'index'])->name('packs.public.index');
+Route::get('/pack/{pack}', [\App\Http\Controllers\Pack\PackViewController::class, 'show'])->name('packs.public.show');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');

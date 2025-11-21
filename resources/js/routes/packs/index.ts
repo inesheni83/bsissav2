@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::create
- * @see app/Http/Controllers/Pack/PackController.php:40
+ * @see app/Http/Controllers/Pack/PackController.php:41
  * @route '/admin/packs/create'
  */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::create
- * @see app/Http/Controllers/Pack/PackController.php:40
+ * @see app/Http/Controllers/Pack/PackController.php:41
  * @route '/admin/packs/create'
  */
 create.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::create
- * @see app/Http/Controllers/Pack/PackController.php:40
+ * @see app/Http/Controllers/Pack/PackController.php:41
  * @route '/admin/packs/create'
  */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -77,7 +77,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Pack\PackController::create
- * @see app/Http/Controllers/Pack/PackController.php:40
+ * @see app/Http/Controllers/Pack/PackController.php:41
  * @route '/admin/packs/create'
  */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -87,7 +87,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::store
- * @see app/Http/Controllers/Pack/PackController.php:63
+ * @see app/Http/Controllers/Pack/PackController.php:64
  * @route '/admin/packs'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -102,7 +102,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::store
- * @see app/Http/Controllers/Pack/PackController.php:63
+ * @see app/Http/Controllers/Pack/PackController.php:64
  * @route '/admin/packs'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -111,7 +111,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::store
- * @see app/Http/Controllers/Pack/PackController.php:63
+ * @see app/Http/Controllers/Pack/PackController.php:64
  * @route '/admin/packs'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -121,7 +121,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::show
- * @see app/Http/Controllers/Pack/PackController.php:114
+ * @see app/Http/Controllers/Pack/PackController.php:115
  * @route '/admin/packs/{pack}'
  */
 export const show = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -136,7 +136,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::show
- * @see app/Http/Controllers/Pack/PackController.php:114
+ * @see app/Http/Controllers/Pack/PackController.php:115
  * @route '/admin/packs/{pack}'
  */
 show.url = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -169,7 +169,7 @@ show.url = (args: { pack: number | { id: number } } | [pack: number | { id: numb
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::show
- * @see app/Http/Controllers/Pack/PackController.php:114
+ * @see app/Http/Controllers/Pack/PackController.php:115
  * @route '/admin/packs/{pack}'
  */
 show.get = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -178,7 +178,7 @@ show.get = (args: { pack: number | { id: number } } | [pack: number | { id: numb
 })
 /**
 * @see \App\Http\Controllers\Pack\PackController::show
- * @see app/Http/Controllers/Pack/PackController.php:114
+ * @see app/Http/Controllers/Pack/PackController.php:115
  * @route '/admin/packs/{pack}'
  */
 show.head = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -188,7 +188,7 @@ show.head = (args: { pack: number | { id: number } } | [pack: number | { id: num
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::edit
- * @see app/Http/Controllers/Pack/PackController.php:128
+ * @see app/Http/Controllers/Pack/PackController.php:129
  * @route '/admin/packs/{pack}/edit'
  */
 export const edit = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -203,7 +203,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::edit
- * @see app/Http/Controllers/Pack/PackController.php:128
+ * @see app/Http/Controllers/Pack/PackController.php:129
  * @route '/admin/packs/{pack}/edit'
  */
 edit.url = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -236,7 +236,7 @@ edit.url = (args: { pack: number | { id: number } } | [pack: number | { id: numb
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::edit
- * @see app/Http/Controllers/Pack/PackController.php:128
+ * @see app/Http/Controllers/Pack/PackController.php:129
  * @route '/admin/packs/{pack}/edit'
  */
 edit.get = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -245,7 +245,7 @@ edit.get = (args: { pack: number | { id: number } } | [pack: number | { id: numb
 })
 /**
 * @see \App\Http\Controllers\Pack\PackController::edit
- * @see app/Http/Controllers/Pack/PackController.php:128
+ * @see app/Http/Controllers/Pack/PackController.php:129
  * @route '/admin/packs/{pack}/edit'
  */
 edit.head = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -255,7 +255,7 @@ edit.head = (args: { pack: number | { id: number } } | [pack: number | { id: num
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::update
- * @see app/Http/Controllers/Pack/PackController.php:154
+ * @see app/Http/Controllers/Pack/PackController.php:155
  * @route '/admin/packs/{pack}'
  */
 export const update = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -270,7 +270,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::update
- * @see app/Http/Controllers/Pack/PackController.php:154
+ * @see app/Http/Controllers/Pack/PackController.php:155
  * @route '/admin/packs/{pack}'
  */
 update.url = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -303,7 +303,7 @@ update.url = (args: { pack: number | { id: number } } | [pack: number | { id: nu
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::update
- * @see app/Http/Controllers/Pack/PackController.php:154
+ * @see app/Http/Controllers/Pack/PackController.php:155
  * @route '/admin/packs/{pack}'
  */
 update.put = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -313,7 +313,7 @@ update.put = (args: { pack: number | { id: number } } | [pack: number | { id: nu
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::duplicate
- * @see app/Http/Controllers/Pack/PackController.php:223
+ * @see app/Http/Controllers/Pack/PackController.php:224
  * @route '/admin/packs/{pack}/duplicate'
  */
 export const duplicate = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -328,7 +328,7 @@ duplicate.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::duplicate
- * @see app/Http/Controllers/Pack/PackController.php:223
+ * @see app/Http/Controllers/Pack/PackController.php:224
  * @route '/admin/packs/{pack}/duplicate'
  */
 duplicate.url = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -361,7 +361,7 @@ duplicate.url = (args: { pack: number | { id: number } } | [pack: number | { id:
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::duplicate
- * @see app/Http/Controllers/Pack/PackController.php:223
+ * @see app/Http/Controllers/Pack/PackController.php:224
  * @route '/admin/packs/{pack}/duplicate'
  */
 duplicate.post = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -371,7 +371,7 @@ duplicate.post = (args: { pack: number | { id: number } } | [pack: number | { id
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::destroy
- * @see app/Http/Controllers/Pack/PackController.php:204
+ * @see app/Http/Controllers/Pack/PackController.php:205
  * @route '/admin/packs/{pack}'
  */
 export const destroy = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -386,7 +386,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::destroy
- * @see app/Http/Controllers/Pack/PackController.php:204
+ * @see app/Http/Controllers/Pack/PackController.php:205
  * @route '/admin/packs/{pack}'
  */
 destroy.url = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -419,7 +419,7 @@ destroy.url = (args: { pack: number | { id: number } } | [pack: number | { id: n
 
 /**
 * @see \App\Http\Controllers\Pack\PackController::destroy
- * @see app/Http/Controllers/Pack/PackController.php:204
+ * @see app/Http/Controllers/Pack/PackController.php:205
  * @route '/admin/packs/{pack}'
  */
 destroy.delete = (args: { pack: number | { id: number } } | [pack: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
