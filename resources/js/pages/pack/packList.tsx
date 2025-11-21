@@ -46,7 +46,8 @@ type Pack = {
     savings_percentage: number | null;
     is_active: boolean;
     stock_quantity: number;
-    products: Array<{
+    products_count: number;
+    products?: Array<{
         id: number;
         name: string;
         pivot: {
@@ -455,8 +456,8 @@ export default function PackList({ packs }: PageProps) {
                                             </TableCell>
                                             <TableCell>
                                                 <span className="text-sm text-slate-600">
-                                                    {pack.products.length} produit
-                                                    {pack.products.length > 1 ? 's' : ''}
+                                                    {pack.products_count} produit
+                                                    {pack.products_count > 1 ? 's' : ''}
                                                 </span>
                                             </TableCell>
                                             <TableCell>

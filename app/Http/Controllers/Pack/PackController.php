@@ -25,7 +25,8 @@ class PackController extends Controller
     {
         $this->authorize('viewAny', Pack::class);
 
-        $packs = Pack::with(['products', 'creator'])
+        $packs = Pack::withCount('products')
+            ->with('creator:id,name')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -43,7 +44,7 @@ class PackController extends Controller
 
         // Récupérer les produits disponibles pour le vendeur ou admin
         $user = Auth::user();
-        $productsQuery = Product::with(['category', 'weightVariants']);
+        $productsQuery = Product::with(['category:id,name', 'weightVariants:id,product_id,weight_value,weight_unit,price,stock_quantity']);
 
         if ($user->role === 'vendeur') {
             $productsQuery->where('created_by', $user->id);
@@ -133,7 +134,7 @@ class PackController extends Controller
 
         // Récupérer les produits disponibles
         $user = Auth::user();
-        $productsQuery = Product::with(['category', 'weightVariants']);
+        $productsQuery = Product::with(['category:id,name', 'weightVariants:id,product_id,weight_value,weight_unit,price,stock_quantity']);
 
         if ($user->role === 'vendeur') {
             $productsQuery->where('created_by', $user->id);
@@ -235,8 +236,8 @@ class PackController extends Controller
             $newPack->updated_by = Auth::id();
             $newPack->save();
 
-            // Copier les produits associés
-            $products = $pack->products;
+            // Copier les produits associés (sans charger toutes les données)
+            $products = $pack->products()->select('products.id')->get();
             foreach ($products as $product) {
                 $newPack->products()->attach($product->id, [
                     'quantity' => $product->pivot->quantity
