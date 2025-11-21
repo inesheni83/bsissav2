@@ -6,9 +6,11 @@ use App\Http\Requests\Cart\AddCartItemRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
 use App\Models\CartItem;
 use App\Models\DeliveryFee;
+use App\Models\Pack;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,27 +29,40 @@ class CartController extends Controller
         $activeDeliveryFee = DeliveryFee::where('is_active', true)->first();
         $deliveryFee = $activeDeliveryFee ? (float) $activeDeliveryFee->amount : 0;
 
-        // Formater les données des items avec les informations de poids
+        // Formater les données des items avec les informations de poids et packs
         $items->getCollection()->transform(function ($item) {
-            return [
+            $data = [
                 'id' => $item->id,
                 'quantity' => $item->quantity,
                 'unit_price' => $item->unit_price,
                 'total_price' => $item->total_price,
-                'product' => [
+            ];
+
+            if ($item->product) {
+                $data['product'] = [
                     'id' => $item->product->id,
                     'name' => $item->product->name,
                     'image' => $item->product->image,
                     'price' => $item->product->price,
-                ],
-                'weight_variant' => $item->weightVariant ? [
+                ];
+                $data['weight_variant'] = $item->weightVariant ? [
                     'id' => $item->weightVariant->id,
                     'weight_value' => $item->weightVariant->weight_value,
                     'weight_unit' => $item->weightVariant->weight_unit,
                     'price' => (float) $item->weightVariant->price,
                     'promotional_price' => $item->weightVariant->promotional_price ? (float) $item->weightVariant->promotional_price : null,
-                ] : null,
-            ];
+                ] : null;
+            } elseif ($item->pack) {
+                $data['pack'] = [
+                    'id' => $item->pack->id,
+                    'name' => $item->pack->name,
+                    'slug' => $item->pack->slug,
+                    'main_image_url' => $item->pack->main_image_url,
+                    'price' => (float) $item->pack->price,
+                ];
+            }
+
+            return $data;
         });
 
         return Inertia::render('cart/index', [
@@ -67,6 +82,24 @@ class CartController extends Controller
         $this->cartService->addItem($product, $quantity, $variantId);
 
         return back()->with('success', 'Produit ajoute au panier.');
+    }
+
+    public function storePack(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'pack_id' => 'required|exists:packs,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $pack = Pack::findOrFail($request->pack_id);
+        $quantity = (int) $request->quantity;
+
+        try {
+            $this->cartService->addPack($pack, $quantity);
+            return back()->with('success', 'Pack ajouté au panier.');
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function update(UpdateCartItemRequest $request, CartItem $cartItem): RedirectResponse

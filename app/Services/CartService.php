@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CartItem;
 use App\Models\DeliveryFee;
 use App\Models\Order;
+use App\Models\Pack;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\DatabaseManager;
@@ -34,7 +35,7 @@ class CartService
     {
         $owner = $this->getOwner();
 
-        return CartItem::with(['product', 'weightVariant'])
+        return CartItem::with(['product', 'pack', 'weightVariant'])
             ->forOwner($owner['user_id'], $owner['session_id'])
             ->orderByDesc('created_at')
             ->paginate(10)
@@ -45,7 +46,7 @@ class CartService
     {
         $owner = $this->getOwner();
 
-        return CartItem::with(['product', 'weightVariant'])
+        return CartItem::with(['product', 'pack', 'weightVariant'])
             ->forOwner($owner['user_id'], $owner['session_id'])
             ->orderByDesc('created_at')
             ->get();
@@ -83,6 +84,45 @@ class CartService
             $cartItem->save();
 
             return $cartItem->load(['product', 'weightVariant']);
+        });
+    }
+
+    public function addPack(Pack $pack, int $quantity): CartItem
+    {
+        $owner = $this->getOwner();
+
+        return $this->db->transaction(function () use ($pack, $quantity, $owner) {
+            // Check stock availability
+            if ($pack->stock_quantity < $quantity) {
+                throw new \RuntimeException('Stock insuffisant pour ce pack.');
+            }
+
+            $payload = array_merge($owner, [
+                'pack_id' => $pack->id,
+                'product_id' => null,
+                'weight_variant_id' => null,
+            ]);
+
+            $cartItem = CartItem::where($payload)->first();
+
+            if ($cartItem) {
+                // Update existing cart item
+                $newQuantity = $cartItem->quantity + $quantity;
+                if ($pack->stock_quantity < $newQuantity) {
+                    throw new \RuntimeException('Stock insuffisant pour ce pack.');
+                }
+                $cartItem->quantity = $newQuantity;
+            } else {
+                // Create new cart item
+                $cartItem = new CartItem($payload);
+                $cartItem->quantity = $quantity;
+            }
+
+            $cartItem->unit_price = $pack->price;
+            $cartItem->total_price = $cartItem->quantity * $cartItem->unit_price;
+            $cartItem->save();
+
+            return $cartItem->load('pack');
         });
     }
 
@@ -143,7 +183,15 @@ class CartService
         return $this->db->transaction(function () use ($owner, $items, $subtotal, $itemsCount, $delivery, $deliveryFeesId) {
             // Vérifier la disponibilité du stock avant de créer la commande
             foreach ($items as $item) {
-                if ($item->weightVariant) {
+                if ($item->pack) {
+                    $availableStock = $item->pack->stock_quantity;
+                    if ($availableStock < $item->quantity) {
+                        throw new \RuntimeException(
+                            "Stock insuffisant pour le pack {$item->pack->name}. " .
+                            "Stock disponible: {$availableStock}, Quantité demandée: {$item->quantity}"
+                        );
+                    }
+                } elseif ($item->weightVariant) {
                     $availableStock = $item->weightVariant->stock_quantity;
                     if ($availableStock < $item->quantity) {
                         throw new \RuntimeException(
@@ -171,12 +219,26 @@ class CartService
                 'delivery_fees_id' => $deliveryFeesId,
                 'items_count' => $itemsCount,
                 'items' => $items->map(function (CartItem $item) {
+                    if ($item->pack) {
+                        return [
+                            'pack_id' => $item->pack_id,
+                            'product_id' => null,
+                            'weight_variant_id' => null,
+                            'name' => 'Pack: ' . $item->pack->name,
+                            'image' => $item->pack->main_image_url,
+                            'quantity' => $item->quantity,
+                            'unit_price' => (float) $item->unit_price,
+                            'total_price' => (float) $item->total_price,
+                        ];
+                    }
+
                     $name = $item->product?->name ?? 'Produit #' . $item->product_id;
                     if ($item->weightVariant) {
                         $name .= ' - ' . $item->weightVariant->weight_value . ' ' . $item->weightVariant->weight_unit;
                     }
 
                     return [
+                        'pack_id' => null,
                         'product_id' => $item->product_id,
                         'weight_variant_id' => $item->weight_variant_id,
                         'name' => $name,
@@ -189,9 +251,11 @@ class CartService
                 'status' => 'pending',
             ]);
 
-            // Mettre à jour le stock des produits (weight variants)
+            // Mettre à jour le stock des produits (weight variants) et packs
             foreach ($items as $item) {
-                if ($item->weightVariant) {
+                if ($item->pack) {
+                    $item->pack->decrement('stock_quantity', $item->quantity);
+                } elseif ($item->weightVariant) {
                     $item->weightVariant->decrement('stock_quantity', $item->quantity);
                 }
             }

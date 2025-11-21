@@ -13,6 +13,7 @@ class CartItem extends Model
 
     protected $fillable = [
         'product_id',
+        'pack_id',
         'weight_variant_id',
         'user_id',
         'session_id',
@@ -30,6 +31,11 @@ class CartItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function pack(): BelongsTo
+    {
+        return $this->belongsTo(Pack::class);
     }
 
     public function weightVariant(): BelongsTo

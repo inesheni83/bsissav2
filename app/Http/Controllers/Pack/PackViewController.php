@@ -107,12 +107,25 @@ class PackViewController extends Controller
      */
     public function show(Pack $pack): Response
     {
-        abort_unless($pack->is_active && $pack->stock_quantity > 0, 404);
+        abort_unless($pack->is_active, 404);
 
         $pack->load(['products.weightVariants', 'products.category']);
 
+        // Get similar packs (same price range, active, in stock, excluding current pack)
+        $priceMin = $pack->price * 0.8; // -20%
+        $priceMax = $pack->price * 1.2; // +20%
+
+        $similarPacks = Pack::where('is_active', true)
+            ->where('stock_quantity', '>', 0)
+            ->where('id', '!=', $pack->id)
+            ->whereBetween('price', [$priceMin, $priceMax])
+            ->withCount('products')
+            ->limit(3)
+            ->get();
+
         return Inertia::render('pack/public/show', [
             'pack' => $pack,
+            'similarPacks' => $similarPacks,
         ]);
     }
 }

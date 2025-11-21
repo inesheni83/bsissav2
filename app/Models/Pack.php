@@ -41,6 +41,14 @@ class Pack extends Model
     protected $hidden = ['main_image_data'];
 
     /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
      * Accessor pour l'URL de l'image principale
      */
     public function getMainImageUrlAttribute(): ?string
