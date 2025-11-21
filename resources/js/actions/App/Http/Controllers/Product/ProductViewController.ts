@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 /**
 * @see \App\Http\Controllers\Product\ProductViewController::show
  * @see app/Http/Controllers/Product/ProductViewController.php:12
- * @route '/products/{product}'
+ * @route '/product/{product}'
  */
 export const show = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
@@ -11,13 +11,13 @@ export const show = (args: { product: number | { id: number } } | [product: numb
 
 show.definition = {
     methods: ["get","head"],
-    url: '/products/{product}',
+    url: '/product/{product}',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
 * @see \App\Http\Controllers\Product\ProductViewController::show
  * @see app/Http/Controllers/Product/ProductViewController.php:12
- * @route '/products/{product}'
+ * @route '/product/{product}'
  */
 show.url = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
@@ -50,7 +50,7 @@ show.url = (args: { product: number | { id: number } } | [product: number | { id
 /**
 * @see \App\Http\Controllers\Product\ProductViewController::show
  * @see app/Http/Controllers/Product/ProductViewController.php:12
- * @route '/products/{product}'
+ * @route '/product/{product}'
  */
 show.get = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
@@ -59,7 +59,7 @@ show.get = (args: { product: number | { id: number } } | [product: number | { id
 /**
 * @see \App\Http\Controllers\Product\ProductViewController::show
  * @see app/Http/Controllers/Product/ProductViewController.php:12
- * @route '/products/{product}'
+ * @route '/product/{product}'
  */
 show.head = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),

@@ -78,7 +78,7 @@ logout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\HomeController::home
- * @see app/Http/Controllers/HomeController.php:21
+ * @see app/Http/Controllers/HomeController.php:22
  * @route '/'
  */
 export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -93,7 +93,7 @@ home.definition = {
 
 /**
 * @see \App\Http\Controllers\HomeController::home
- * @see app/Http/Controllers/HomeController.php:21
+ * @see app/Http/Controllers/HomeController.php:22
  * @route '/'
  */
 home.url = (options?: RouteQueryOptions) => {
@@ -102,7 +102,7 @@ home.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\HomeController::home
- * @see app/Http/Controllers/HomeController.php:21
+ * @see app/Http/Controllers/HomeController.php:22
  * @route '/'
  */
 home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -111,7 +111,7 @@ home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\HomeController::home
- * @see app/Http/Controllers/HomeController.php:21
+ * @see app/Http/Controllers/HomeController.php:22
  * @route '/'
  */
 home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -163,7 +163,7 @@ about.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web.php:30
+ * @see [serialized-closure]:2
  * @route '/dashboard'
  */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -177,7 +177,7 @@ dashboard.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:30
+ * @see [serialized-closure]:2
  * @route '/dashboard'
  */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -185,7 +185,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:30
+ * @see [serialized-closure]:2
  * @route '/dashboard'
  */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -193,7 +193,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web.php:30
+ * @see [serialized-closure]:2
  * @route '/dashboard'
  */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

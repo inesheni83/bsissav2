@@ -12,6 +12,7 @@ import GalleryImage from './GalleryImage'
 import Customer from './Customer'
 import Settings from './Settings'
 import Category from './Category'
+import Pack from './Pack'
 const Controllers = {
     Auth: Object.assign(Auth, Auth),
 HomeController: Object.assign(HomeController, HomeController),
@@ -27,6 +28,7 @@ GalleryImage: Object.assign(GalleryImage, GalleryImage),
 Customer: Object.assign(Customer, Customer),
 Settings: Object.assign(Settings, Settings),
 Category: Object.assign(Category, Category),
+Pack: Object.assign(Pack, Pack),
 }
 
 export default Controllers

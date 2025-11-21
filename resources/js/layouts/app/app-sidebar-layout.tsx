@@ -4,9 +4,10 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { dashboardSeller } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
+import { index as packsIndex } from '@/routes/packs';
 import { create as createProductRoute } from '@/actions/App/Http/Controllers/Product/AddProductController.ts';
 import { NavItem, type BreadcrumbItem, type SharedData } from '@/types';
-import { LayoutGrid, Layers, PackageSearch, Plus, ShoppingBag, FileText, Truck, Image, Users, Settings } from 'lucide-react';
+import { LayoutGrid, Layers, PackageSearch, Plus, ShoppingBag, FileText, Truck, Image, Users, Settings, Package } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 import { usePage } from '@inertiajs/react';
 
@@ -20,6 +21,11 @@ const mainNavItems: NavItem[] = [
         title: 'Mes produits',
         href: productsIndex(),
         icon: PackageSearch,
+    },
+    {
+        title: 'Packs',
+        href: '/admin/packs',
+        icon: Package,
     },
     {
         title: 'Catégories',

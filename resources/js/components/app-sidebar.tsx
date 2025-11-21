@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem, type PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Globe, Layers, LifeBuoy, PackageSearch, PlusCircle, ShoppingBag } from 'lucide-react';
+import { Globe, Layers, LifeBuoy, Package, PackageSearch, PlusCircle, ShoppingBag } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -20,6 +20,11 @@ const mainNavItems: NavItem[] = [
         title: 'Mes produits',
         href: '/products',
         icon: ShoppingBag,
+    },
+    {
+        title: 'Packs',
+        href: '/admin/packs',
+        icon: Package,
     },
     {
         title: 'Catégories',

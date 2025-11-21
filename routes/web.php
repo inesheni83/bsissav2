@@ -23,8 +23,17 @@ use App\Http\Controllers\Customer\CustomerController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 
-// Public product detail route (accessible to all)
-Route::get('/products/{product}', [ProductViewController::class, 'show'])->name('products.show');
+// Test route to debug authentication
+Route::get('/test-auth', function () {
+    return response()->json([
+        'authenticated' => auth()->check(),
+        'user' => auth()->user(),
+        'session_id' => session()->getId(),
+    ]);
+});
+
+// Public product detail route (accessible to all) - MUST use 'product' prefix to avoid conflicts
+Route::get('/product/{product}', [ProductViewController::class, 'show'])->name('products.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -49,7 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Admin and Vendeur routes
-Route::middleware(['auth', 'verified', 'admin.vendeur'])->group(function () {
+Route::middleware(['auth', 'admin.vendeur'])->group(function () {
     Route::get('dashboardSeller', [SellerDashboardController::class, 'index'])->name('dashboardSeller');
 
     Route::get('/add-product', [AddProductController::class, 'create'])->name('product.add');
@@ -94,6 +103,16 @@ Route::middleware(['auth', 'verified', 'admin.vendeur'])->group(function () {
     Route::delete('/admin/settings/site/logo', [SiteSettingsController::class, 'deleteLogo'])->name('admin.settings.site.deleteLogo');
 
     Route::resource('categories', CategoryController::class)->except(['show']);
+
+    // Pack management routes (must be before product routes with {product} parameter)
+    Route::get('/admin/packs', [\App\Http\Controllers\Pack\PackController::class, 'index'])->name('packs.index');
+    Route::get('/admin/packs/create', [\App\Http\Controllers\Pack\PackController::class, 'create'])->name('packs.create');
+    Route::post('/admin/packs', [\App\Http\Controllers\Pack\PackController::class, 'store'])->name('packs.store');
+    Route::get('/admin/packs/{pack}', [\App\Http\Controllers\Pack\PackController::class, 'show'])->name('packs.show');
+    Route::get('/admin/packs/{pack}/edit', [\App\Http\Controllers\Pack\PackController::class, 'edit'])->name('packs.edit');
+    Route::put('/admin/packs/{pack}', [\App\Http\Controllers\Pack\PackController::class, 'update'])->name('packs.update');
+    Route::post('/admin/packs/{pack}/duplicate', [\App\Http\Controllers\Pack\PackController::class, 'duplicate'])->name('packs.duplicate');
+    Route::delete('/admin/packs/{pack}', [\App\Http\Controllers\Pack\PackController::class, 'destroy'])->name('packs.destroy');
 
     // Product management routes
     Route::get('/products', [ProductListController::class, 'index'])->name('products.index');
