@@ -351,7 +351,7 @@ export default function Homepage({ products, categories, galleryImages, filters 
                                                     key={product.id}
                                                     className="flex flex-col rounded-[28px] overflow-hidden shadow-[0_35px_65px_-30px_rgba(40,40,40,0.45)] bg-white transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-[0_45px_80px_-40px_rgba(40,40,40,0.5)]"
                                                 >
-                                                    <Link href={`/products/${product.id}`} className="relative block bg-[#8C4B1F]">
+                                                    <Link href={`/product/${product.id}`} className="relative block bg-[#8C4B1F]">
                                                         {product.image_url ? (
                                                             <img
                                                                 src={product.image_url}
@@ -382,7 +382,7 @@ export default function Homepage({ products, categories, galleryImages, filters 
 
                                                     <div className="flex-1 bg-white px-7 py-7 space-y-6">
                                                         <div>
-                                                            <Link href={`/products/${product.id}`}>
+                                                            <Link href={`/product/${product.id}`}>
                                                                 <h3
                                                                     className="text-[#2F5A24] text-2xl md:text-3xl font-semibold hover:text-[#1f3b17] transition-colors"
                                                                     style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}
