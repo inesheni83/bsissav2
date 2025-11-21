@@ -13,6 +13,14 @@ type Product = {
     price: string | number;
 };
 
+type Pack = {
+    id: number;
+    name: string;
+    slug: string;
+    main_image_url: string | null;
+    price: number;
+};
+
 type WeightVariant = {
     id: number;
     weight_value: number;
@@ -26,7 +34,8 @@ type CartItem = {
     quantity: number;
     unit_price: string | number;
     total_price: string | number;
-    product: Product;
+    product?: Product;
+    pack?: Pack;
     weight_variant?: WeightVariant | null;
 };
 
@@ -144,19 +153,48 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                 items.data.map((item) => {
                                     const quantity = formState[item.id]?.quantity ?? item.quantity;
                                     const lineTotal = quantity * Number(item.unit_price);
+                                    const isPack = !!item.pack;
+
+                                    // Determine image, name, and additional info
+                                    let imageUrl: string | null = null;
+                                    let name = '';
+                                    let additionalInfo: string | null = null;
+
+                                    if (isPack && item.pack) {
+                                        imageUrl = item.pack.main_image_url;
+                                        name = item.pack.name;
+                                        additionalInfo = `Pack de produits`;
+                                    } else if (item.product) {
+                                        imageUrl = item.product.image ?? null;
+                                        name = item.product.name;
+                                        if (item.weight_variant) {
+                                            additionalInfo = `Poids: ${item.weight_variant.weight_value} ${item.weight_variant.weight_unit}`;
+                                        }
+                                    }
 
                                     return (
-                                        <div key={item.id} className="rounded-2xl border border-emerald-100 bg-white shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
-                                            <div className="grid grid-cols-[auto_1fr_auto] gap-4 p-6">
+                                        <div
+                                            key={item.id}
+                                            className={`rounded-2xl border ${isPack ? 'border-amber-200 bg-gradient-to-br from-amber-50/50 to-white' : 'border-emerald-100 bg-white'} shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]`}
+                                        >
+                                            {isPack && (
+                                                <div className="px-6 pt-4 pb-2">
+                                                    <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 text-xs font-semibold text-white">
+                                                        <Package className="h-3 w-3" />
+                                                        PACK
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="grid grid-cols-[auto_1fr_auto] gap-4 p-6 pt-3">
                                                 <div>
-                                                    {item.product.image_url_url ? (
+                                                    {imageUrl ? (
                                                         <img
-                                                            src={`/storage/${item.product.image_url_url}`}
-                                                            alt={item.product.name}
-                                                            className="h-24 w-24 rounded-xl object-cover"
+                                                            src={imageUrl}
+                                                            alt={name}
+                                                            className={`h-24 w-24 rounded-xl object-cover ${isPack ? 'ring-2 ring-amber-400' : ''}`}
                                                         />
                                                     ) : (
-                                                        <div className="h-24 w-24 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-400">
+                                                        <div className={`h-24 w-24 rounded-xl ${isPack ? 'bg-amber-100 text-amber-600' : 'bg-emerald-50 text-emerald-400'} flex items-center justify-center`}>
                                                             <Package className="w-8 h-8" />
                                                         </div>
                                                     )}
@@ -164,19 +202,22 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
 
                                                 <div className="flex flex-col gap-2">
                                                     <div>
-                                                        <p className="text-lg font-semibold text-emerald-900" style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
-                                                            {item.product.name}
+                                                        <p className={`text-lg font-semibold ${isPack ? 'text-amber-900' : 'text-emerald-900'}`} style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                                                            {name}
                                                         </p>
-                                                        {item.weight_variant && (
-                                                            <p className="text-sm font-medium text-emerald-700">
-                                                                Poids: {item.weight_variant.weight_value} {item.weight_variant.weight_unit}
+                                                        {additionalInfo && (
+                                                            <p className={`text-sm font-medium ${isPack ? 'text-amber-700' : 'text-emerald-700'}`}>
+                                                                {additionalInfo}
                                                             </p>
                                                         )}
+                                                        <p className="text-xs text-slate-500 mt-1">
+                                                            Prix unitaire: {Number(item.unit_price).toFixed(2)} TND
+                                                        </p>
                                                     </div>
 
                                                     <div className="flex items-center gap-4">
                                                         <div>
-                                                            <label htmlFor={`quantity-${item.id}`} className="text-xs uppercase text-emerald-900/60 tracking-widest">
+                                                            <label htmlFor={`quantity-${item.id}`} className={`text-xs uppercase ${isPack ? 'text-amber-900/60' : 'text-emerald-900/60'} tracking-widest`}>
                                                                 Quantité
                                                             </label>
                                                             <Input
@@ -185,13 +226,13 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                                                 min={1}
                                                                 value={quantity}
                                                                 onChange={(event) => handleQuantityChange(item.id, Number(event.target.value))}
-                                                                className="mt-1 h-10 w-20 rounded-full border-emerald-200 text-center"
+                                                                className={`mt-1 h-10 w-20 rounded-full text-center ${isPack ? 'border-amber-300 focus:ring-amber-400' : 'border-emerald-200 focus:ring-emerald-400'}`}
                                                             />
                                                         </div>
 
                                                         <div className="ml-auto text-right">
-                                                            <p className="text-xs uppercase text-emerald-900/60 tracking-widest">Total</p>
-                                                            <p className="text-lg font-semibold text-emerald-800">{lineTotal.toFixed(2)} TND</p>
+                                                            <p className={`text-xs uppercase ${isPack ? 'text-amber-900/60' : 'text-emerald-900/60'} tracking-widest`}>Total</p>
+                                                            <p className={`text-lg font-semibold ${isPack ? 'text-amber-800' : 'text-emerald-800'}`}>{lineTotal.toFixed(2)} TND</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -200,7 +241,7 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                                     <button
                                                         type="button"
                                                         onClick={() => removeItem(item.id)}
-                                                        className="text-red-500 hover:text-red-600"
+                                                        className="text-red-500 hover:text-red-600 transition-colors"
                                                         aria-label="Retirer l'article"
                                                     >
                                                         <Trash2 className="w-5 h-5" />

@@ -1,9 +1,8 @@
 import GuestLayout from '@/layouts/guest-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Package, ShoppingCart, Tag, ArrowLeft, Check, ChevronLeft, ChevronRight, X, Share2, Facebook, MessageCircle, Star, AlertCircle, Home } from 'lucide-react';
+import { Package, ShoppingCart, Tag, Check, ChevronLeft, ChevronRight, X, AlertCircle, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 
 type Product = {
@@ -69,7 +68,6 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
     const [selectedImage, setSelectedImage] = useState<string>(pack.main_image_url || '');
     const [quantity, setQuantity] = useState(1);
     const [showImageModal, setShowImageModal] = useState(false);
-    const [showShareMenu, setShowShareMenu] = useState(false);
     const [toast, setToast] = useState<string | null>(null);
 
     const allImages = [
@@ -105,23 +103,6 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
             },
         });
     };
-
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const shareText = `Découvrez ${pack.name} à ${Number(pack.price).toFixed(2)} TND`;
-
-    const handleShare = (platform: string) => {
-        const urls: Record<string, string> = {
-            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-            whatsapp: `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`,
-        };
-
-        if (urls[platform]) {
-            window.open(urls[platform], '_blank', 'width=600,height=400');
-        }
-        setShowShareMenu(false);
-    };
-
-    const totalProducts = pack.products.reduce((sum, product) => sum + product.pivot.quantity, 0);
 
     return (
         <GuestLayout>
@@ -237,37 +218,45 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
                             )}
                         </div>
 
-                        {/* Pricing Section */}
-                        <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50 p-6">
-                            <div className="mb-3 flex items-baseline gap-3">
-                                <span className="text-4xl font-extrabold text-[#2F5A24]">
+                        {/* Pricing & Purchase Section */}
+                        <div className="space-y-4 rounded-2xl border border-emerald-100 bg-white p-6 shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
+                            {/* Prix */}
+                            <div className="flex items-baseline gap-3">
+                                <span className="text-3xl font-extrabold text-emerald-800" style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
                                     {Number(pack.price).toFixed(2)} TND
                                 </span>
                                 {pack.reference_price && (
-                                    <span className="text-xl text-slate-400 line-through">
+                                    <span className="text-lg text-slate-400 line-through">
                                         {Number(pack.reference_price).toFixed(2)} TND
                                     </span>
                                 )}
                             </div>
 
+                            {/* Étiquette d'économie en orange */}
                             {pack.savings && pack.savings_percentage && (
-                                <div className="flex flex-wrap gap-2">
-                                    <Badge className="bg-orange-500 text-white hover:bg-orange-600 text-base px-4 py-1">
-                                        <Tag className="mr-2 h-4 w-4" />
+                                <div>
+                                    <Badge className="bg-orange-500 text-white hover:bg-orange-600 text-sm px-3 py-1">
+                                        <Tag className="mr-1 h-3 w-3" />
                                         Économisez {Number(pack.savings).toFixed(2)} TND ({pack.savings_percentage}%)
                                     </Badge>
                                 </div>
                             )}
-                        </div>
 
-                        {/* Stock Info */}
-                        <div>
+                            {/* Stock Info */}
                             {pack.stock_quantity > 0 ? (
-                                <div className="flex items-center gap-2">
-                                    <Check className="h-5 w-5 text-emerald-600" />
-                                    <span className="text-slate-700 font-medium">
-                                        En stock ({pack.stock_quantity} disponible{pack.stock_quantity > 1 ? 's' : ''})
-                                    </span>
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <Check className="h-5 w-5 text-emerald-600" />
+                                        <span className="text-slate-700 font-medium">
+                                            En stock ({pack.stock_quantity} disponible{pack.stock_quantity > 1 ? 's' : ''})
+                                        </span>
+                                    </div>
+                                    {pack.stock_quantity < 10 && (
+                                        <div className="flex items-center gap-2 text-orange-600">
+                                            <AlertCircle className="h-5 w-5" />
+                                            <span className="font-medium">Plus que {pack.stock_quantity} en stock !</span>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 text-red-600">
@@ -276,133 +265,69 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
                                 </div>
                             )}
 
-                            {pack.stock_quantity > 0 && pack.stock_quantity < 10 && (
-                                <div className="mt-2 flex items-center gap-2 text-orange-600">
-                                    <AlertCircle className="h-5 w-5" />
-                                    <span className="font-medium">Plus que {pack.stock_quantity} en stock !</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Quantity Selector */}
-                        {pack.stock_quantity > 0 && (
-                            <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4">
-                                <label className="text-sm font-semibold text-slate-700">
-                                    Quantité:
-                                </label>
-                                <div className="flex items-center gap-3">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        disabled={quantity <= 1}
-                                        className="h-10 w-10 rounded-full"
-                                    >
-                                        -
-                                    </Button>
-                                    <span className="w-12 text-center text-lg font-bold">{quantity}</span>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setQuantity(Math.min(pack.stock_quantity, quantity + 1))}
-                                        disabled={quantity >= pack.stock_quantity}
-                                        className="h-10 w-10 rounded-full"
-                                    >
-                                        +
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Add to Cart Button */}
-                        <Button
-                            className="w-full gap-2 rounded-full bg-[#7A3E12] py-6 text-lg font-semibold hover:bg-[#5f2f0d] disabled:opacity-50"
-                            disabled={pack.stock_quantity === 0}
-                            onClick={handleAddToCart}
-                        >
-                            <ShoppingCart className="h-5 w-5" />
-                            Ajouter au panier
-                        </Button>
-
-                        {/* Product Count & Share */}
-                        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-4">
-                            <div className="flex items-center gap-2 text-slate-700">
-                                <Package className="h-5 w-5 text-[#8C4B1F]" />
-                                <span className="font-medium">
-                                    {totalProducts} article{totalProducts > 1 ? 's' : ''} ({pack.products.length} produit{pack.products.length > 1 ? 's' : ''})
-                                </span>
-                            </div>
-
-                            {/* Share Button */}
-                            <div className="relative">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setShowShareMenu(!showShareMenu)}
-                                    className="gap-2"
-                                >
-                                    <Share2 className="h-4 w-4" />
-                                    Partager
-                                </Button>
-
-                                {showShareMenu && (
-                                    <div className="absolute right-0 top-full mt-2 z-10 w-48 rounded-lg border border-slate-200 bg-white shadow-xl">
-                                        <button
-                                            onClick={() => handleShare('facebook')}
-                                            className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors"
-                                        >
-                                            <Facebook className="h-5 w-5 text-blue-600" />
-                                            <span className="text-sm font-medium">Facebook</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleShare('whatsapp')}
-                                            className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors"
-                                        >
-                                            <MessageCircle className="h-5 w-5 text-green-600" />
-                                            <span className="text-sm font-medium">WhatsApp</span>
-                                        </button>
+                            {/* Quantity Selector & Add to Cart */}
+                            {pack.stock_quantity > 0 ? (
+                                <>
+                                    <div>
+                                        <label htmlFor="quantity" className="text-xs uppercase text-emerald-900/60 tracking-widest block mb-2">
+                                            Quantité
+                                        </label>
                                     </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Rating */}
-                        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
-                            <div className="flex">
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                    <Star key={index} className="h-5 w-5 text-[#F5B301] fill-[#F5B301]" />
-                                ))}
-                            </div>
-                            <span className="text-sm font-medium text-slate-700">5.0/5 (Excellent)</span>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            id="quantity"
+                                            type="number"
+                                            min={1}
+                                            max={pack.stock_quantity}
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(Math.max(1, Math.min(pack.stock_quantity, Number(e.target.value))))}
+                                            className="h-10 w-24 rounded-full border border-emerald-200 bg-white text-center text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                                            aria-label="Quantité"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={handleAddToCart}
+                                            className="ml-auto inline-flex items-center gap-2 rounded-full bg-emerald-700 px-6 py-3 text-white hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <ShoppingCart className="w-4 h-4" />
+                                            Ajouter au panier
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <Button
+                                    className="w-full gap-2 rounded-full bg-emerald-700 py-3 text-white hover:bg-emerald-800 disabled:opacity-50"
+                                    disabled={true}
+                                >
+                                    <ShoppingCart className="h-5 w-5" />
+                                    Rupture de stock
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Detailed Description */}
                 {pack.detailed_description && (
-                    <Card className="mt-8">
-                        <CardHeader>
-                            <CardTitle className="text-[#2F5A24]" style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                    <div className="mt-12">
+                        <div className="rounded-3xl border border-emerald-100 bg-white p-8 shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
+                            <h2 className="mb-6 text-2xl font-bold text-emerald-900" style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
                                 Description détaillée
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                            </h2>
                             <div
-                                className="prose max-w-none text-[#4A4A4A]"
+                                className="prose prose-emerald prose-sm max-w-none text-emerald-900/80"
                                 dangerouslySetInnerHTML={{ __html: pack.detailed_description }}
                             />
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 )}
 
                 {/* Products in Pack */}
-                <Card className="mt-8">
-                    <CardHeader>
-                        <CardTitle className="text-[#2F5A24]" style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                <div className="mt-12">
+                    <div className="rounded-3xl border border-emerald-100 bg-white p-8 shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
+                        <h2 className="mb-6 text-2xl font-bold text-emerald-900" style={{ fontFamily: '"Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' }}>
                             Composition du pack
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                        </h2>
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {pack.products.map((product) => (
                                 <Link
@@ -443,8 +368,8 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
                                 </Link>
                             ))}
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
                 {/* Similar Packs Section */}
                 {similarPacks.length > 0 && (
