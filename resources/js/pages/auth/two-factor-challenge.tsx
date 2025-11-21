@@ -17,7 +17,7 @@ export default function TwoFactorChallenge() {
     const [code, setCode] = useState<string>('');
     const [recoveryCode, setRecoveryCode] = useState<string>('');
 
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+    const { setData, post, processing, errors, reset, clearErrors } = useForm({
         code: '',
         recovery_code: '',
     });

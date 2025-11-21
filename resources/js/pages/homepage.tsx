@@ -89,16 +89,6 @@ export default function Homepage({ products, categories, galleryImages, filters 
         in_stock: filters.in_stock || '',
     });
 
-    const submitFilters = (event: FormEvent) => {
-        event.preventDefault();
-        get(home({ query: data }).url, { preserveState: true, preserveScroll: true });
-    };
-
-    const clearFilters = () => {
-        setData({ search: '', category_id: '', featured: '', in_stock: '' });
-        get(home().url, { preserveState: true, preserveScroll: true });
-    };
-
     const updateQuantity = (productId: number, value: number) => {
         setQuantities((prev) => ({
             ...prev,
@@ -136,45 +126,57 @@ export default function Homepage({ products, categories, galleryImages, filters 
 
     // Shared filter form markup reused for desktop and mobile panels.
     const filtersForm = useMemo(
-        () => (
-            <form onSubmit={submitFilters} className="space-y-5">
-                <div className="space-y-2">
-                    <Label htmlFor="search">Rechercher</Label>
-                    <Input id="search" value={data.search} onChange={(event) => setData('search', event.target.value)} placeholder="Nom ou description..." />
-                </div>
+        () => {
+            const submitFilters = (event: FormEvent) => {
+                event.preventDefault();
+                get(home({ query: data }).url, { preserveState: true, preserveScroll: true });
+            };
 
-                <div className="space-y-2">
-                    <Label htmlFor="category_id">Categorie</Label>
-                    <Select value={data.category_id || undefined} onValueChange={(value) => setData('category_id', value || '')}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Toutes les categories" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {categories.map((category) => (
-                                <SelectItem key={category.id} value={String(category.id)}>
-                                    {category.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+            const clearFilters = () => {
+                setData({ search: '', category_id: '', featured: '', in_stock: '' });
+                get(home().url, { preserveState: true, preserveScroll: true });
+            };
 
-                <div className="flex items-center gap-2">
-                    <Checkbox id="in_stock" checked={data.in_stock === '1'} onCheckedChange={(checked) => setData('in_stock', checked ? '1' : '')} />
-                    <Label htmlFor="in_stock" className="text-sm text-gray-600 font-normal cursor-pointer">En stock</Label>
-                </div>
+            return (
+                <form onSubmit={submitFilters} className="space-y-5">
+                    <div className="space-y-2">
+                        <Label htmlFor="search">Rechercher</Label>
+                        <Input id="search" value={data.search} onChange={(event) => setData('search', event.target.value)} placeholder="Nom ou description..." />
+                    </div>
 
-                <div className="flex gap-3">
-                    <Button type="submit" className="w-full shadow hover:shadow-lg">
-                        <Search className="w-4 h-4 mr-2" /> Rechercher
-                    </Button>
-                    <Button type="button" variant="outline" onClick={clearFilters} className="w-full hover:shadow">
-                        Effacer
-                    </Button>
-                </div>
-            </form>
-        ),
-        [data.search, data.category_id, data.in_stock, categories, submitFilters, clearFilters, setData],
+                    <div className="space-y-2">
+                        <Label htmlFor="category_id">Categorie</Label>
+                        <Select value={data.category_id || undefined} onValueChange={(value) => setData('category_id', value || '')}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Toutes les categories" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {categories.map((category) => (
+                                    <SelectItem key={category.id} value={String(category.id)}>
+                                        {category.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Checkbox id="in_stock" checked={data.in_stock === '1'} onCheckedChange={(checked) => setData('in_stock', checked ? '1' : '')} />
+                        <Label htmlFor="in_stock" className="text-sm text-gray-600 font-normal cursor-pointer">En stock</Label>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <Button type="submit" className="w-full shadow hover:shadow-lg">
+                            <Search className="w-4 h-4 mr-2" /> Rechercher
+                        </Button>
+                        <Button type="button" variant="outline" onClick={clearFilters} className="w-full hover:shadow">
+                            Effacer
+                        </Button>
+                    </div>
+                </form>
+            );
+        },
+        [data, categories, get, setData],
     );
 
     return (

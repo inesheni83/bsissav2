@@ -267,7 +267,7 @@ export default function PackList({ packs }: PageProps) {
                                             <Label htmlFor="status-filter">Statut</Label>
                                             <Select
                                                 value={statusFilter}
-                                                onValueChange={(value: any) =>
+                                                onValueChange={(value: 'all' | 'active' | 'inactive') =>
                                                     setStatusFilter(value)
                                                 }
                                             >
@@ -290,7 +290,7 @@ export default function PackList({ packs }: PageProps) {
                                             <Label htmlFor="stock-filter">Disponibilité</Label>
                                             <Select
                                                 value={stockFilter}
-                                                onValueChange={(value: any) => setStockFilter(value)}
+                                                onValueChange={(value: 'all' | 'in_stock' | 'out_of_stock') => setStockFilter(value)}
                                             >
                                                 <SelectTrigger id="stock-filter">
                                                     <SelectValue placeholder="Tous les stocks" />
@@ -313,7 +313,7 @@ export default function PackList({ packs }: PageProps) {
                                             <Label htmlFor="price-filter">Fourchette de prix</Label>
                                             <Select
                                                 value={priceRangeFilter}
-                                                onValueChange={(value: any) =>
+                                                onValueChange={(value: 'all' | '0-50' | '50-100' | '100+') =>
                                                     setPriceRangeFilter(value)
                                                 }
                                             >

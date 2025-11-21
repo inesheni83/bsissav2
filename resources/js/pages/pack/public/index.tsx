@@ -49,7 +49,7 @@ type PageProps = {
     };
 };
 
-export default function PackPublicIndex({ packs, totalPacks, filters }: PageProps) {
+export default function PackPublicIndex({ packs, filters }: PageProps) {
     const [showFilters, setShowFilters] = useState(false);
 
     const handleFilterChange = (filterType: string, value: string) => {
