@@ -141,6 +141,19 @@ class CartService
         $deliveryFeesId = $activeDeliveryFee?->id;
 
         return $this->db->transaction(function () use ($owner, $items, $subtotal, $itemsCount, $delivery, $deliveryFeesId) {
+            // Vérifier la disponibilité du stock avant de créer la commande
+            foreach ($items as $item) {
+                if ($item->weightVariant) {
+                    $availableStock = $item->weightVariant->stock_quantity;
+                    if ($availableStock < $item->quantity) {
+                        throw new \RuntimeException(
+                            "Stock insuffisant pour {$item->product->name} - {$item->weightVariant->weight_value}{$item->weightVariant->weight_unit}. " .
+                            "Stock disponible: {$availableStock}, Quantité demandée: {$item->quantity}"
+                        );
+                    }
+                }
+            }
+
             $order = Order::create([
                 'user_id' => $owner['user_id'],
                 'session_id' => $owner['session_id'],
@@ -175,6 +188,13 @@ class CartService
                 })->values()->all(),
                 'status' => 'pending',
             ]);
+
+            // Mettre à jour le stock des produits (weight variants)
+            foreach ($items as $item) {
+                if ($item->weightVariant) {
+                    $item->weightVariant->decrement('stock_quantity', $item->quantity);
+                }
+            }
 
             CartItem::forOwner($owner['user_id'], $owner['session_id'])->delete();
 

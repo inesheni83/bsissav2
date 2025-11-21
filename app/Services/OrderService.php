@@ -5,11 +5,13 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
+use App\Models\ProductWeightVariant;
 use App\Notifications\OrderStatusChanged;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
@@ -119,29 +121,36 @@ class OrderService
             return $order;
         }
 
-        // Update order status
-        $order->update(['status' => $newStatus]);
+        return DB::transaction(function () use ($order, $oldStatus, $newStatus, $note) {
+            // Restaurer le stock si la commande passe à 'cancelled' ou 'failed'
+            if (in_array($newStatus, ['cancelled', 'failed']) && in_array($oldStatus, ['pending', 'processing', 'shipped'])) {
+                $this->restoreStock($order);
+            }
 
-        // Create status history entry
-        OrderStatusHistory::create([
-            'order_id' => $order->id,
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
-            'changed_by' => Auth::id(),
-            'note' => $note,
-        ]);
+            // Update order status
+            $order->update(['status' => $newStatus]);
 
-        // Send notification to customer if they have a user account
-        if ($order->user) {
-            $order->user->notify(new OrderStatusChanged($order, $oldStatus, $newStatus));
-        }
+            // Create status history entry
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'changed_by' => Auth::id(),
+                'note' => $note,
+            ]);
 
-        // Generate invoice automatically when order is marked as delivered
-        if ($newStatus === 'delivered') {
-            $this->generateAndSaveInvoice($order);
-        }
+            // Send notification to customer if they have a user account
+            if ($order->user) {
+                $order->user->notify(new OrderStatusChanged($order, $oldStatus, $newStatus));
+            }
 
-        return $order->fresh();
+            // Generate invoice automatically when order is marked as delivered
+            if ($newStatus === 'delivered') {
+                $this->generateAndSaveInvoice($order);
+            }
+
+            return $order->fresh();
+        });
     }
 
     /**
@@ -268,6 +277,24 @@ class OrderService
         } catch (\Exception $e) {
             // Log error but don't throw exception to avoid breaking the status update
             \Log::error("Failed to generate invoice for order {$order->reference}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Restore stock for cancelled or failed orders.
+     */
+    private function restoreStock(Order $order): void
+    {
+        $items = $order->items ?? [];
+
+        foreach ($items as $item) {
+            if (isset($item['weight_variant_id']) && $item['weight_variant_id']) {
+                $weightVariant = ProductWeightVariant::find($item['weight_variant_id']);
+                if ($weightVariant) {
+                    $weightVariant->increment('stock_quantity', $item['quantity']);
+                    \Log::info("Stock restored: {$item['quantity']} units for weight variant ID {$item['weight_variant_id']} (Order: {$order->reference})");
+                }
+            }
         }
     }
 }
