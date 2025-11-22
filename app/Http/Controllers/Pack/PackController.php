@@ -42,16 +42,22 @@ class PackController extends Controller
     {
         $this->authorize('create', Pack::class);
 
-        // Récupérer les produits disponibles pour le vendeur ou admin
+        // Récupérer les produits disponibles pour le vendeur ou admin avec optimisation
         $user = Auth::user();
-        $productsQuery = Product::with(['category:id,name', 'weightVariants:id,product_id,weight_value,weight_unit,price,stock_quantity']);
+        $productsQuery = Product::select(['id', 'name', 'slug', 'image', 'image_data', 'image_mime_type', 'category_id'])
+            ->with([
+                'category:id,name',
+                'weightVariants' => function ($query) {
+                    $query->select(['id', 'product_id', 'weight_value', 'weight_unit', 'price', 'stock_quantity'])
+                        ->orderBy('weight_value');
+                }
+            ]);
 
         if ($user->role === 'vendeur') {
             $productsQuery->where('created_by', $user->id);
         }
 
-        $products = $productsQuery->orderBy('name')
-            ->get(['id', 'name', 'slug', 'image', 'image_data', 'image_mime_type', 'category_id']);
+        $products = $productsQuery->orderBy('name')->get();
 
         return Inertia::render('pack/addPack', [
             'products' => $products,
@@ -130,18 +136,24 @@ class PackController extends Controller
     {
         $this->authorize('update', $pack);
 
-        $pack->load('products');
+        $pack->load('products:id,name');
 
-        // Récupérer les produits disponibles
+        // Récupérer les produits disponibles avec optimisation
         $user = Auth::user();
-        $productsQuery = Product::with(['category:id,name', 'weightVariants:id,product_id,weight_value,weight_unit,price,stock_quantity']);
+        $productsQuery = Product::select(['id', 'name', 'slug', 'image', 'image_data', 'image_mime_type', 'category_id'])
+            ->with([
+                'category:id,name',
+                'weightVariants' => function ($query) {
+                    $query->select(['id', 'product_id', 'weight_value', 'weight_unit', 'price', 'stock_quantity'])
+                        ->orderBy('weight_value');
+                }
+            ]);
 
         if ($user->role === 'vendeur') {
             $productsQuery->where('created_by', $user->id);
         }
 
-        $products = $productsQuery->orderBy('name')
-            ->get(['id', 'name', 'slug', 'image', 'image_data', 'image_mime_type', 'category_id']);
+        $products = $productsQuery->orderBy('name')->get();
 
         return Inertia::render('pack/editPack', [
             'pack' => $pack,
