@@ -51,6 +51,7 @@ class CartController extends Controller
                     'weight_unit' => $item->weightVariant->weight_unit,
                     'price' => (float) $item->weightVariant->price,
                     'promotional_price' => $item->weightVariant->promotional_price ? (float) $item->weightVariant->promotional_price : null,
+                    'stock_quantity' => $item->weightVariant->stock_quantity,
                 ] : null;
             } elseif ($item->pack) {
                 $data['pack'] = [
@@ -59,6 +60,8 @@ class CartController extends Controller
                     'slug' => $item->pack->slug,
                     'main_image_url' => $item->pack->main_image_url,
                     'price' => (float) $item->pack->price,
+                    'products_count' => $item->pack->products()->count(),
+                    'stock_quantity' => $item->pack->stock_quantity,
                 ];
             }
 

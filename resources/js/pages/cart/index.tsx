@@ -1,5 +1,5 @@
 ﻿import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Trash2, ArrowLeft, Package, MessageSquare } from 'lucide-react';
+import { Trash2, ArrowLeft, Package, MessageSquare, AlertCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import PublicLayout from '@/layouts/public-layout';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ type Pack = {
     slug: string;
     main_image_url: string | null;
     price: number;
+    products_count: number;
+    stock_quantity: number;
 };
 
 type WeightVariant = {
@@ -27,6 +29,7 @@ type WeightVariant = {
     weight_unit: 'g' | 'kg';
     price: number;
     promotional_price?: number | null;
+    stock_quantity: number;
 };
 
 type CartItem = {
@@ -72,6 +75,23 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
     useEffect(() => {
         setFormState(initialState);
     }, [initialState]);
+
+    // Recalcul automatique du total en temps réel
+    const calculatedSummary = useMemo(() => {
+        let subtotal = 0;
+        let itemsCount = 0;
+
+        items.data.forEach((item) => {
+            const quantity = formState[item.id]?.quantity ?? item.quantity;
+            subtotal += quantity * Number(item.unit_price);
+            itemsCount += quantity;
+        });
+
+        return {
+            subtotal,
+            itemsCount,
+        };
+    }, [formState, items.data]);
 
     const handleQuantityChange = (itemId: number, quantity: number) => {
         setFormState((prev) => ({
@@ -129,7 +149,7 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold text-emerald-900">Panier</h1>
-                                <p className="text-sm text-emerald-900/70">Vous avez {summary.items_count} article(s) dans votre panier.</p>
+                                <p className="text-sm text-emerald-900/70">Vous avez {calculatedSummary.itemsCount} article(s) dans votre panier.</p>
                             </div>
                         </div>
                         <Link href="/" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-900">
@@ -155,20 +175,26 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                     const lineTotal = quantity * Number(item.unit_price);
                                     const isPack = !!item.pack;
 
-                                    // Determine image, name, and additional info
+                                    // Determine image, name, additional info, and stock
                                     let imageUrl: string | null = null;
                                     let name = '';
                                     let additionalInfo: string | null = null;
+                                    let stockQuantity = 0;
+                                    let hasStockIssue = false;
 
                                     if (isPack && item.pack) {
                                         imageUrl = item.pack.main_image_url;
                                         name = item.pack.name;
-                                        additionalInfo = `Pack de produits`;
+                                        additionalInfo = `Pack de ${item.pack.products_count} produit${item.pack.products_count > 1 ? 's' : ''}`;
+                                        stockQuantity = item.pack.stock_quantity;
+                                        hasStockIssue = quantity > stockQuantity;
                                     } else if (item.product) {
                                         imageUrl = item.product.image ?? null;
                                         name = item.product.name;
                                         if (item.weight_variant) {
                                             additionalInfo = `Poids: ${item.weight_variant.weight_value} ${item.weight_variant.weight_unit}`;
+                                            stockQuantity = item.weight_variant.stock_quantity;
+                                            hasStockIssue = quantity > stockQuantity;
                                         }
                                     }
 
@@ -213,6 +239,14 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                                         <p className="text-xs text-slate-500 mt-1">
                                                             Prix unitaire: {Number(item.unit_price).toFixed(2)} TND
                                                         </p>
+                                                        {hasStockIssue && (
+                                                            <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-red-50 px-2 py-1.5 text-xs text-red-700 border border-red-200">
+                                                                <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                                                                <span className="font-medium">
+                                                                    Stock insuffisant ! Seulement {stockQuantity} disponible{stockQuantity > 1 ? 's' : ''}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     <div className="flex items-center gap-4">
@@ -224,9 +258,13 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                                                 id={`quantity-${item.id}`}
                                                                 type="number"
                                                                 min={1}
+                                                                max={stockQuantity}
                                                                 value={quantity}
-                                                                onChange={(event) => handleQuantityChange(item.id, Number(event.target.value))}
-                                                                className={`mt-1 h-10 w-20 rounded-full text-center ${isPack ? 'border-amber-300 focus:ring-amber-400' : 'border-emerald-200 focus:ring-emerald-400'}`}
+                                                                onChange={(event) => {
+                                                                    const newQuantity = Number(event.target.value);
+                                                                    handleQuantityChange(item.id, Math.min(newQuantity, stockQuantity));
+                                                                }}
+                                                                className={`mt-1 h-10 w-20 rounded-full text-center ${hasStockIssue ? 'border-red-300 focus:ring-red-400' : isPack ? 'border-amber-300 focus:ring-amber-400' : 'border-emerald-200 focus:ring-emerald-400'}`}
                                                             />
                                                         </div>
 
@@ -257,11 +295,11 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                         <aside className="space-y-6">
                             <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">
                                 <h2 className="text-lg font-semibold text-emerald-900">Récapitulatif</h2>
-                                {summary.items_count > 0 ? (
+                                {calculatedSummary.itemsCount > 0 ? (
                                     <div className="mt-4 space-y-2 text-sm text-emerald-900/70">
                                         <div className="flex items-center justify-between">
                                             <span>Sous-total</span>
-                                            <span className="font-semibold text-emerald-800">{summary.subtotal.toFixed(2)} TND</span>
+                                            <span className="font-semibold text-emerald-800">{calculatedSummary.subtotal.toFixed(2)} TND</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span>Frais de livraison</span>
@@ -269,7 +307,7 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                         </div>
                                         <div className="flex items-center justify-between border-t border-emerald-100 pt-2 text-base">
                                             <span className="font-semibold text-emerald-900">Total</span>
-                                            <span className="font-bold text-emerald-800">{(summary.subtotal + deliveryFee).toFixed(2)} TND</span>
+                                            <span className="font-bold text-emerald-800">{(calculatedSummary.subtotal + deliveryFee).toFixed(2)} TND</span>
                                         </div>
                                     </div>
                                 ) : (
@@ -280,12 +318,12 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                     type="button"
                                     onClick={proceedToCheckout}
                                     className="mt-6 w-full rounded-full bg-emerald-700 hover:bg-emerald-800 text-white py-3"
-                                    disabled={summary.items_count === 0}
+                                    disabled={calculatedSummary.itemsCount === 0}
                                 >
                                     Passer à la livraison
                                 </Button>
 
-                                {summary.items_count > 0 && (
+                                {calculatedSummary.itemsCount > 0 && (
                                     <button
                                         type="button"
                                         onClick={clearCart}
