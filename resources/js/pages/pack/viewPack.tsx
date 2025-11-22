@@ -93,7 +93,7 @@ export default function ViewPack({ pack }: PageProps) {
                                 </div>
                             </div>
 
-                            <Link href={route('packs.edit', pack.id)}>
+                            <Link href={route('packs.edit', pack.slug)}>
                                 <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
                                     <Edit className="mr-2 h-4 w-4" />
                                     Modifier

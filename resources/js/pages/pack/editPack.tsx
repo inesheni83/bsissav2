@@ -231,7 +231,7 @@ export default function EditPack({ pack, products }: PageProps) {
             formDataToSend.append(`products[${index}][quantity]`, item.quantity.toString());
         });
 
-        router.post(route('packs.update', pack.id), formDataToSend, {
+        router.post(route('packs.update', pack.slug), formDataToSend, {
             forceFormData: true,
             preserveState: (page) => Object.keys(page.props.errors || {}).length > 0,
             preserveScroll: (page) => Object.keys(page.props.errors || {}).length > 0,

@@ -140,8 +140,8 @@ export default function PackList({ packs }: PageProps) {
         return filtered;
     }, [packs.data, searchQuery, statusFilter, stockFilter, priceRangeFilter, sortBy, sortOrder]);
 
-    const handleDelete = (packId: number) => {
-        router.delete(route('packs.destroy', packId), {
+    const handleDelete = (packSlug: string) => {
+        router.delete(route('packs.destroy', packSlug), {
             preserveScroll: true,
             onSuccess: () => {
                 console.log('Pack supprimé avec succès');
@@ -149,9 +149,9 @@ export default function PackList({ packs }: PageProps) {
         });
     };
 
-    const handleDuplicate = (packId: number) => {
+    const handleDuplicate = (packSlug: string) => {
         router.post(
-            route('packs.duplicate', packId),
+            route('packs.duplicate', packSlug),
             {},
             {
                 preserveScroll: true,
@@ -494,7 +494,7 @@ export default function PackList({ packs }: PageProps) {
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Link href={route('packs.show', pack.id)}>
+                                                    <Link href={route('packs.show', pack.slug)}>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
@@ -504,7 +504,7 @@ export default function PackList({ packs }: PageProps) {
                                                             <Eye className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Link href={route('packs.edit', pack.id)}>
+                                                    <Link href={route('packs.edit', pack.slug)}>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
@@ -518,7 +518,7 @@ export default function PackList({ packs }: PageProps) {
                                                         variant="ghost"
                                                         size="sm"
                                                         className="h-8 w-8 p-0 text-purple-600 hover:text-purple-700"
-                                                        onClick={() => handleDuplicate(pack.id)}
+                                                        onClick={() => handleDuplicate(pack.slug)}
                                                         title="Dupliquer"
                                                     >
                                                         <Copy className="h-4 w-4" />
@@ -551,7 +551,7 @@ export default function PackList({ packs }: PageProps) {
                                                                 </AlertDialogCancel>
                                                                 <AlertDialogAction
                                                                     onClick={() =>
-                                                                        handleDelete(pack.id)
+                                                                        handleDelete(pack.slug)
                                                                     }
                                                                     className="bg-red-600 hover:bg-red-700"
                                                                 >
