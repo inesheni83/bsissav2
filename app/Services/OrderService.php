@@ -20,7 +20,19 @@ class OrderService
      */
     public function getFilteredOrders(array $filters = []): Builder
     {
-        $query = Order::query()
+        $query = Order::select([
+                'id',
+                'reference',
+                'user_id',
+                'first_name',
+                'last_name',
+                'status',
+                'subtotal',
+                'delivery_fees_id',
+                'items_count',
+                'created_at',
+                'updated_at'
+            ])
             ->with('user:id,name,email');
 
         // Filter by status
