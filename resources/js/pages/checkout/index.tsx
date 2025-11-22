@@ -11,13 +11,34 @@ interface CheckoutProduct {
     price: string | number;
 }
 
+interface CheckoutPack {
+    id: number;
+    name: string;
+    slug: string;
+    main_image_url: string | null;
+    price: number;
+    products_count: number;
+    stock_quantity: number;
+}
+
+interface WeightVariant {
+    id: number;
+    weight_value: number;
+    weight_unit: 'g' | 'kg';
+    price: number;
+    promotional_price?: number | null;
+    stock_quantity: number;
+}
+
 interface CheckoutItem {
     id: number;
     quantity: number;
     unit_price: string | number;
     total_price: string | number;
     note?: string | null;
-    product: CheckoutProduct;
+    product?: CheckoutProduct;
+    pack?: CheckoutPack;
+    weight_variant?: WeightVariant | null;
 }
 
 interface CheckoutDelivery {
@@ -182,25 +203,59 @@ export default function CheckoutPage({ items, summary, deliveryFee, delivery, re
                 <div className="grid gap-6 lg:grid-cols-[2fr_1fr] items-start">
                     <div className="space-y-6">
                         <div className="rounded-2xl border border-emerald-100 bg-white shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)] divide-y">
-                            {items.map((item) => (
-                                <div key={item.id} className="grid gap-4 p-6 sm:grid-cols-[auto_1fr_auto]">
-                                    <div className="h-20 w-20 overflow-hidden rounded-xl bg-emerald-50">
-                                        {item.product.image_url_url ? (
-                                            <img src={`/storage/${item.product.image_url_url}`} alt={item.product.name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center text-emerald-300">
-                                                <Package className="w-8 h-8" />
+                            {items.map((item) => {
+                                const isPack = !!item.pack;
+                                let imageUrl: string | null = null;
+                                let name = '';
+                                let additionalInfo: string | null = null;
+
+                                if (isPack && item.pack) {
+                                    imageUrl = item.pack.main_image_url;
+                                    name = item.pack.name;
+                                    additionalInfo = `Pack de ${item.pack.products_count} produit${item.pack.products_count > 1 ? 's' : ''}`;
+                                } else if (item.product) {
+                                    imageUrl = item.product.image ?? null;
+                                    name = item.product.name;
+                                    if (item.weight_variant) {
+                                        additionalInfo = `${item.weight_variant.weight_value} ${item.weight_variant.weight_unit}`;
+                                    }
+                                }
+
+                                return (
+                                    <div
+                                        key={item.id}
+                                        className={`grid gap-4 p-6 sm:grid-cols-[auto_1fr_auto] ${isPack ? 'bg-gradient-to-r from-amber-50/30 to-white' : ''}`}
+                                    >
+                                        <div className={`h-20 w-20 overflow-hidden rounded-xl ${isPack ? 'bg-amber-100 ring-2 ring-amber-400/30' : 'bg-emerald-50'}`}>
+                                            {imageUrl ? (
+                                                <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                <div className={`flex h-full w-full items-center justify-center ${isPack ? 'text-amber-400' : 'text-emerald-300'}`}>
+                                                    <Package className="w-8 h-8" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <p className={`text-lg font-semibold ${isPack ? 'text-amber-900' : 'text-emerald-900'}`}>{name}</p>
+                                                {isPack && (
+                                                    <span className="inline-flex items-center rounded-full bg-amber-500 px-2 py-0.5 text-xs font-semibold text-white">
+                                                        PACK
+                                                    </span>
+                                                )}
                                             </div>
-                                        )}
+                                            {additionalInfo && (
+                                                <p className={`text-sm font-medium ${isPack ? 'text-amber-700' : 'text-emerald-700'}`}>
+                                                    {additionalInfo}
+                                                </p>
+                                            )}
+                                            <p className="text-sm text-emerald-900/70">Quantité : {item.quantity}</p>
+                                            {item.note && <p className="text-xs text-emerald-900/60">Note : {item.note}</p>}
+                                        </div>
+                                        <div className="text-right text-lg font-semibold text-emerald-800">{Number(item.total_price).toFixed(2)} TND</div>
                                     </div>
-                                    <div className="space-y-1">
-                                        <p className="text-lg font-semibold text-emerald-900">{item.product.name}</p>
-                                        <p className="text-sm text-emerald-900/70">Quantite : {item.quantity}</p>
-                                        {item.note && <p className="text-xs text-emerald-900/60">Note : {item.note}</p>}
-                                    </div>
-                                    <div className="text-right text-lg font-semibold text-emerald-800">{Number(item.total_price).toFixed(2)} TND</div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         <div className="space-y-4 rounded-2xl border border-emerald-100 bg-white p-6 shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)]">

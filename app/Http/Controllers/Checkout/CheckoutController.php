@@ -32,6 +32,46 @@ class CheckoutController extends Controller
 
         $items = $this->cartService->getItems();
 
+        // Formater les données des items avec les informations de poids et packs
+        $formattedItems = $items->map(function ($item) {
+            $data = [
+                'id' => $item->id,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+                'total_price' => $item->total_price,
+                'note' => $item->note,
+            ];
+
+            if ($item->product) {
+                $data['product'] = [
+                    'id' => $item->product->id,
+                    'name' => $item->product->name,
+                    'image' => $item->product->image_url,
+                    'price' => $item->product->price,
+                ];
+                $data['weight_variant'] = $item->weightVariant ? [
+                    'id' => $item->weightVariant->id,
+                    'weight_value' => $item->weightVariant->weight_value,
+                    'weight_unit' => $item->weightVariant->weight_unit,
+                    'price' => (float) $item->weightVariant->price,
+                    'promotional_price' => $item->weightVariant->promotional_price ? (float) $item->weightVariant->promotional_price : null,
+                    'stock_quantity' => $item->weightVariant->stock_quantity,
+                ] : null;
+            } elseif ($item->pack) {
+                $data['pack'] = [
+                    'id' => $item->pack->id,
+                    'name' => $item->pack->name,
+                    'slug' => $item->pack->slug,
+                    'main_image_url' => $item->pack->main_image_url,
+                    'price' => (float) $item->pack->price,
+                    'products_count' => $item->pack->products()->count(),
+                    'stock_quantity' => $item->pack->stock_quantity,
+                ];
+            }
+
+            return $data;
+        });
+
         // Récupérer les frais de livraison actifs
         $activeDeliveryFee = DeliveryFee::where('is_active', true)->first();
         $deliveryFee = $activeDeliveryFee ? (float) $activeDeliveryFee->amount : 0;
@@ -54,7 +94,7 @@ class CheckoutController extends Controller
         }
 
         return Inertia::render('checkout/index', [
-            'items' => $items,
+            'items' => $formattedItems,
             'summary' => $summary,
             'deliveryFee' => $deliveryFee,
             'delivery' => session('checkout.delivery'),
