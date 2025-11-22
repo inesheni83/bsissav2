@@ -25,8 +25,16 @@ if (typeof window !== 'undefined') {
             throw new Error(`Route [${name}] not found.`);
         }
 
+        // Convert simple parameter (number/string) to object format
+        let params = parameters;
+        if (route.parameters && route.parameters.length > 0 && typeof parameters !== 'object') {
+            // If parameters is a simple value and route expects parameters,
+            // assume it's for the first parameter
+            params = { [route.parameters[0]]: parameters };
+        }
+
         const uri = route.uri.replace(/\{([^}]+)\}/g, (match: string, param: string) => {
-            return parameters?.[param] || match;
+            return params?.[param] || match;
         });
 
         return ziggyUrl + '/' + uri.replace(/^\/+/, '');
