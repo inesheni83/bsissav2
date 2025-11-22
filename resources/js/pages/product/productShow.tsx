@@ -28,6 +28,7 @@ type Product = {
     detailed_description?: string | null;
     ingredients?: string | null;
     image: string | null;
+    image_url?: string | null;
     is_featured: boolean;
     category: ProductCategory;
     weight_variants: WeightVariant[];
@@ -241,13 +242,13 @@ export default function ProductShow({ product, relatedProducts }: ProductShowPro
                                 return (
                                     <Link
                                         key={relatedProduct.id}
-                                        href={`/products/${relatedProduct.id}`}
+                                        href={`/product/${relatedProduct.id}`}
                                         className="group overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-[0_25px_45px_-25px_rgba(37,99,45,0.25)] transition-all hover:shadow-[0_35px_60px_-15px_rgba(37,99,45,0.35)]"
                                     >
                                         <div className="relative h-64 overflow-hidden bg-emerald-50">
-                                            {relatedProduct.image ? (
+                                            {relatedProduct.image_url ? (
                                                 <img
-                                                    src={`/storage/${relatedProduct.image}`}
+                                                    src={relatedProduct.image_url}
                                                     alt={relatedProduct.name}
                                                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                 />
