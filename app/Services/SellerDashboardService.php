@@ -77,8 +77,9 @@ class SellerDashboardService
      */
     private function getTopSellingProducts(int $limit = 5): array
     {
-        // Récupérer toutes les commandes non annulées avec leurs items
-        $orders = Order::where('status', '!=', 'cancelled')
+        // Récupérer uniquement les colonnes nécessaires des commandes non annulées
+        $orders = Order::select(['id', 'items'])
+            ->where('status', '!=', 'cancelled')
             ->get();
 
         // Calculer les ventes par produit depuis le JSON items
@@ -104,8 +105,16 @@ class SellerDashboardService
         // Récupérer les N premiers produits
         $topProductIds = array_slice(array_keys($productSales), 0, $limit, true);
 
-        // Charger les informations des produits avec leurs variantes
-        $products = Product::with('weightVariants')
+        if (empty($topProductIds)) {
+            return [];
+        }
+
+        // Charger les informations des produits avec leurs variantes (optimisé)
+        $products = Product::select(['id', 'name', 'image', 'image_data', 'image_mime_type'])
+            ->with(['weightVariants' => function ($query) {
+                $query->select(['id', 'product_id', 'price', 'promotional_price'])
+                    ->orderBy('price');
+            }])
             ->whereIn('id', $topProductIds)
             ->get()
             ->keyBy('id');
@@ -133,8 +142,11 @@ class SellerDashboardService
      */
     private function getLowStockProducts(int $threshold = 10): array
     {
-        // Récupérer tous les produits avec leurs variantes de poids
-        $products = Product::with('weightVariants')
+        // Récupérer uniquement les colonnes nécessaires des produits avec leurs variantes
+        $products = Product::select(['id', 'name', 'image', 'image_data', 'image_mime_type'])
+            ->with(['weightVariants' => function ($query) {
+                $query->select(['id', 'product_id', 'stock_quantity', 'price', 'promotional_price']);
+            }])
             ->get()
             ->map(function ($product) {
                 // Calculer le stock total des variantes
@@ -197,7 +209,10 @@ class SellerDashboardService
      */
     private function getRecentOrders(int $limit = 10): array
     {
-        return Order::with('user')
+        return Order::select(['id', 'reference', 'user_id', 'first_name', 'last_name', 'subtotal', 'status', 'created_at', 'items_count'])
+            ->with(['user' => function ($query) {
+                $query->select(['id', 'name', 'email']);
+            }])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get()
