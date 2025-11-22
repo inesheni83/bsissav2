@@ -136,7 +136,11 @@ class PackController extends Controller
     {
         $this->authorize('update', $pack);
 
-        $pack->load('products:id,name');
+        // Charger les produits du pack avec leurs images
+        $pack->load(['products' => function ($query) {
+            $query->select(['products.id', 'products.name', 'products.slug', 'products.image', 'products.image_data', 'products.image_mime_type'])
+                ->withPivot('quantity');
+        }]);
 
         // Récupérer les produits disponibles avec optimisation
         $user = Auth::user();
