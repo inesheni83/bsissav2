@@ -42,7 +42,7 @@ class CartController extends Controller
                 $data['product'] = [
                     'id' => $item->product->id,
                     'name' => $item->product->name,
-                    'image' => $item->product->image,
+                    'image' => $item->product->image_url,
                     'price' => $item->product->price,
                 ];
                 $data['weight_variant'] = $item->weightVariant ? [
