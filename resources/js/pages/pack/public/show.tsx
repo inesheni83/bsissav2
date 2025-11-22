@@ -332,7 +332,7 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
                             {pack.products.map((product) => (
                                 <Link
                                     key={product.id}
-                                    href={`/product/${product.slug}`}
+                                    href={`/product/${product.id}`}
                                     className="group flex gap-4 rounded-[28px] border border-slate-200 p-4 transition-all hover:border-[#8C4B1F] hover:shadow-lg"
                                 >
                                     <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-[#8C4B1F]">
