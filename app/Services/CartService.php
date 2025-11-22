@@ -225,7 +225,7 @@ class CartService
                             'product_id' => null,
                             'weight_variant_id' => null,
                             'name' => 'Pack: ' . $item->pack->name,
-                            'image' => $item->pack->main_image_url,
+                            'image' => $item->pack->main_image,
                             'quantity' => $item->quantity,
                             'unit_price' => (float) $item->unit_price,
                             'total_price' => (float) $item->total_price,
