@@ -51,14 +51,21 @@ type CartSummary = {
     items_count: number;
 };
 
+type DeliveryInfo = {
+    amount: number;
+    is_free: boolean;
+    threshold: number | null;
+    remaining_for_free_shipping: number | null;
+};
+
 type CartPageProps = {
     items: Paginator<CartItem>;
     summary: CartSummary;
-    deliveryFee: number;
+    deliveryInfo: DeliveryInfo;
     savedNote: string;
 };
 
-export default function CartPage({ items, summary, deliveryFee, savedNote }: CartPageProps) {
+export default function CartPage({ items, summary, deliveryInfo, savedNote }: CartPageProps) {
     const { flash } = usePage<SharedData>().props;
     const initialState = useMemo(
         () =>
@@ -301,13 +308,25 @@ export default function CartPage({ items, summary, deliveryFee, savedNote }: Car
                                             <span>Sous-total</span>
                                             <span className="font-semibold text-emerald-800">{calculatedSummary.subtotal.toFixed(2)} TND</span>
                                         </div>
+
+                                        {/* Message de livraison gratuite */}
+                                        {deliveryInfo.remaining_for_free_shipping !== null && deliveryInfo.remaining_for_free_shipping > 0 && (
+                                            <div className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+                                                Plus que <strong>{deliveryInfo.remaining_for_free_shipping.toFixed(2)} TND</strong> pour bénéficier de la livraison gratuite !
+                                            </div>
+                                        )}
+
                                         <div className="flex items-center justify-between">
                                             <span>Frais de livraison</span>
-                                            <span className="font-semibold text-emerald-800">{deliveryFee.toFixed(2)} TND</span>
+                                            {deliveryInfo.is_free ? (
+                                                <span className="font-semibold text-emerald-600">GRATUIT 🎉</span>
+                                            ) : (
+                                                <span className="font-semibold text-emerald-800">{deliveryInfo.amount.toFixed(2)} TND</span>
+                                            )}
                                         </div>
                                         <div className="flex items-center justify-between border-t border-emerald-100 pt-2 text-base">
                                             <span className="font-semibold text-emerald-900">Total</span>
-                                            <span className="font-bold text-emerald-800">{(calculatedSummary.subtotal + deliveryFee).toFixed(2)} TND</span>
+                                            <span className="font-bold text-emerald-800">{(calculatedSummary.subtotal + deliveryInfo.amount).toFixed(2)} TND</span>
                                         </div>
                                     </div>
                                 ) : (

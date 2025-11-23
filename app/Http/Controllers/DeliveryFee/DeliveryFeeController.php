@@ -44,6 +44,7 @@ class DeliveryFeeController extends Controller
                 'delivery_person_name' => $fee->delivery_person_name,
                 'delivery_person_phone' => $fee->delivery_person_phone,
                 'amount' => (float) $fee->amount,
+                'free_shipping_threshold' => $fee->free_shipping_threshold ? (float) $fee->free_shipping_threshold : null,
                 'is_active' => $fee->is_active,
                 'created_at' => $fee->created_at->format('d/m/Y H:i'),
             ]);
@@ -65,6 +66,7 @@ class DeliveryFeeController extends Controller
             'delivery_person_name' => ['required', 'string', 'max:100'],
             'delivery_person_phone' => ['required', 'string', 'max:20'],
             'amount' => ['required', 'numeric', 'min:0'],
+            'free_shipping_threshold' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['boolean'],
             'notes' => ['nullable', 'string'],
         ]);
@@ -84,6 +86,7 @@ class DeliveryFeeController extends Controller
                 'delivery_person_name' => $deliveryFee->delivery_person_name,
                 'delivery_person_phone' => $deliveryFee->delivery_person_phone,
                 'amount' => (float) $deliveryFee->amount,
+                'free_shipping_threshold' => $deliveryFee->free_shipping_threshold ? (float) $deliveryFee->free_shipping_threshold : null,
                 'is_active' => $deliveryFee->is_active,
                 'notes' => $deliveryFee->notes,
             ],
@@ -96,6 +99,7 @@ class DeliveryFeeController extends Controller
             'delivery_person_name' => ['required', 'string', 'max:100'],
             'delivery_person_phone' => ['required', 'string', 'max:20'],
             'amount' => ['required', 'numeric', 'min:0'],
+            'free_shipping_threshold' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['boolean'],
             'notes' => ['nullable', 'string'],
         ]);

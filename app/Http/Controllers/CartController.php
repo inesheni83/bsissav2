@@ -9,6 +9,7 @@ use App\Models\DeliveryFee;
 use App\Models\Pack;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\DeliveryFeeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,8 +17,10 @@ use Inertia\Response;
 
 class CartController extends Controller
 {
-    public function __construct(private CartService $cartService)
-    {
+    public function __construct(
+        private CartService $cartService,
+        private DeliveryFeeService $deliveryFeeService
+    ) {
     }
 
     public function index(): Response
@@ -25,9 +28,8 @@ class CartController extends Controller
         $items = $this->cartService->getCartItems();
         $summary = $this->cartService->getSummary();
 
-        // Récupérer les frais de livraison actifs
-        $activeDeliveryFee = DeliveryFee::where('is_active', true)->first();
-        $deliveryFee = $activeDeliveryFee ? (float) $activeDeliveryFee->amount : 0;
+        // Calculer les frais de livraison avec le seuil de livraison gratuite
+        $deliveryInfo = $this->deliveryFeeService->calculateDeliveryFee($summary['subtotal']);
 
         // Formater les données des items avec les informations de poids et packs
         $items->getCollection()->transform(function ($item) {
@@ -71,7 +73,7 @@ class CartController extends Controller
         return Inertia::render('cart/index', [
             'items' => $items,
             'summary' => $summary,
-            'deliveryFee' => $deliveryFee,
+            'deliveryInfo' => $deliveryInfo,
             'savedNote' => '',
         ]);
     }

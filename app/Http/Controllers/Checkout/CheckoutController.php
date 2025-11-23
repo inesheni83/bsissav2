@@ -7,6 +7,7 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 use App\Models\DeliveryFee;
 use App\Models\Order;
 use App\Services\CartService;
+use App\Services\DeliveryFeeService;
 use App\Support\OrderPresenter;
 use App\Support\TunisiaRegions;
 use Illuminate\Http\RedirectResponse;
@@ -16,8 +17,10 @@ use Inertia\Response;
 
 class CheckoutController extends Controller
 {
-    public function __construct(private CartService $cartService)
-    {
+    public function __construct(
+        private CartService $cartService,
+        private DeliveryFeeService $deliveryFeeService
+    ) {
     }
 
     public function show(): Response|RedirectResponse
@@ -72,9 +75,8 @@ class CheckoutController extends Controller
             return $data;
         });
 
-        // Récupérer les frais de livraison actifs
-        $activeDeliveryFee = DeliveryFee::where('is_active', true)->first();
-        $deliveryFee = $activeDeliveryFee ? (float) $activeDeliveryFee->amount : 0;
+        // Calculer les frais de livraison avec le seuil de livraison gratuite
+        $deliveryInfo = $this->deliveryFeeService->calculateDeliveryFee($summary['subtotal']);
 
         // Préparer les données du client connecté pour pré-remplir le formulaire
         $user = Auth::user();
@@ -96,7 +98,7 @@ class CheckoutController extends Controller
         return Inertia::render('checkout/index', [
             'items' => $formattedItems,
             'summary' => $summary,
-            'deliveryFee' => $deliveryFee,
+            'deliveryInfo' => $deliveryInfo,
             'delivery' => session('checkout.delivery'),
             'regions' => TunisiaRegions::all(),
             'userInfo' => $userInfo,

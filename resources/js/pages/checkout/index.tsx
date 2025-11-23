@@ -64,13 +64,20 @@ interface UserInfo {
     country?: string | null;
 }
 
+interface DeliveryInfo {
+    amount: number;
+    is_free: boolean;
+    threshold: number | null;
+    remaining_for_free_shipping: number | null;
+}
+
 interface CheckoutProps {
     items: CheckoutItem[];
     summary: {
         subtotal: number;
         items_count: number;
     };
-    deliveryFee: number;
+    deliveryInfo: DeliveryInfo;
     delivery?: CheckoutDelivery | null;
     regions: string[];
     userInfo?: UserInfo | null;
@@ -90,7 +97,7 @@ type CheckoutFormData = {
 
 const DEFAULT_COUNTRY = 'Tunisie';
 
-export default function CheckoutPage({ items, summary, deliveryFee, delivery, regions, userInfo }: CheckoutProps) {
+export default function CheckoutPage({ items, summary, deliveryInfo, delivery, regions, userInfo }: CheckoutProps) {
     const { flash } = usePage<SharedData>().props;
     const availableRegions = regions.length > 0 ? regions : [
         'Ariana',
@@ -446,13 +453,25 @@ export default function CheckoutPage({ items, summary, deliveryFee, delivery, re
                                     <span>Sous-total</span>
                                     <span className="font-semibold text-emerald-800">{summary.subtotal.toFixed(2)} TND</span>
                                 </div>
+
+                                {/* Message de livraison gratuite */}
+                                {deliveryInfo.is_free && (
+                                    <div className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+                                        🎉 Vous bénéficiez de la livraison gratuite !
+                                    </div>
+                                )}
+
                                 <div className="flex items-center justify-between">
                                     <span>Frais de livraison</span>
-                                    <span className="font-semibold text-emerald-800">{deliveryFee.toFixed(2)} TND</span>
+                                    {deliveryInfo.is_free ? (
+                                        <span className="font-semibold text-emerald-600">GRATUIT 🎉</span>
+                                    ) : (
+                                        <span className="font-semibold text-emerald-800">{deliveryInfo.amount.toFixed(2)} TND</span>
+                                    )}
                                 </div>
                                 <div className="flex items-center justify-between border-t border-emerald-100 pt-2 text-base">
                                     <span className="font-semibold text-emerald-900">Total</span>
-                                    <span className="font-bold text-emerald-800">{(summary.subtotal + deliveryFee).toFixed(2)} TND</span>
+                                    <span className="font-bold text-emerald-800">{(summary.subtotal + deliveryInfo.amount).toFixed(2)} TND</span>
                                 </div>
                             </div>
                         </div>

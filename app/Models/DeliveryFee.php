@@ -14,12 +14,14 @@ class DeliveryFee extends Model
         'delivery_person_name',
         'delivery_person_phone',
         'amount',
+        'free_shipping_threshold',
         'is_active',
         'notes',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'free_shipping_threshold' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 
