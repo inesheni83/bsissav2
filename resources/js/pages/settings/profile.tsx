@@ -69,7 +69,8 @@ export default function Profile({
             <SettingsLayout>
                 <div className="space-y-6">
                     <Form
-                        {...ProfileController.update.form()}
+                        action={ProfileController.update().url}
+                        method={ProfileController.update().method}
                         options={{
                             preserveScroll: true,
                         }}

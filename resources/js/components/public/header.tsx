@@ -35,9 +35,16 @@ type SiteSettings = {
     youtube_url: string | null;
 };
 
+type DeliveryInfo = {
+    amount: number;
+    is_free: boolean;
+    threshold: number | null;
+    remaining_for_free_shipping: number | null;
+};
+
 export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSettings }) {
-    const page = usePage<SharedData>();
-    const { auth, cart } = page.props;
+    const page = usePage<SharedData & { deliveryInfo?: DeliveryInfo }>();
+    const { auth, cart, deliveryInfo } = page.props;
     const currentUrl = page.url;
     const userRole = auth?.user?.role;
     const canAccessSellerArea = userRole === 'admin' || userRole === 'vendeur';
@@ -131,6 +138,12 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
                                     <Mail className="h-4 w-4 text-amber-300" />
                                     {siteSettings.contact_email}
                                 </a>
+                            )}
+                            {deliveryInfo?.threshold !== null && (
+                                <div className="flex items-center gap-2">
+                                    <ShoppingCart className="h-4 w-4 text-amber-300" />
+                                    <span>Plus que {Math.round(deliveryInfo.threshold)} TND pour bénéficier de la livraison gratuite !</span>
+                                </div>
                             )}
                         </div>
                         <p className="hidden xl:block text-emerald-100/60">Saveurs authentiques de Tunisie · Livraison express en 24h</p>

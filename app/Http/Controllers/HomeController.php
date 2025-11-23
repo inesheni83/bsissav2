@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\ProductService;
 use App\Services\SiteSettingsService;
+use App\Services\DeliveryFeeService;
+use App\Services\CartService;
 use App\Models\Category;
 use App\Models\GalleryImage;
 use App\Http\Requests\HomeFilterRequest;
@@ -15,7 +17,9 @@ class HomeController extends Controller
 {
     public function __construct(
         private ProductService $productService,
-        private SiteSettingsService $siteSettingsService
+        private SiteSettingsService $siteSettingsService,
+        private DeliveryFeeService $deliveryFeeService,
+        private CartService $cartService
     ) {
     }
 
@@ -76,11 +80,16 @@ class HomeController extends Controller
 
         $siteSettings = $this->siteSettingsService->getSettings();
 
+        // Calculer les frais de livraison pour afficher le message de livraison gratuite
+        $summary = $this->cartService->getSummary();
+        $deliveryInfo = $this->deliveryFeeService->calculateDeliveryFee($summary['subtotal']);
+
         return Inertia::render('homepage', [
             'products' => $products,
             'categories' => $categories,
             'filters' => $filters,
             'galleryImages' => $galleryImages,
+            'deliveryInfo' => $deliveryInfo,
             'siteSettings' => [
                 'site_name' => $siteSettings->site_name,
                 'contact_email' => $siteSettings->contact_email,
