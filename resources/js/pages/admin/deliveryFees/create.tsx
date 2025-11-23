@@ -13,6 +13,7 @@ type FormData = {
     delivery_person_name: string;
     delivery_person_phone: string;
     amount: number | string;
+    free_shipping_threshold: number | string;
     is_active: boolean;
     notes: string;
 };
@@ -22,6 +23,7 @@ export default function DeliveryFeesCreate() {
         delivery_person_name: '',
         delivery_person_phone: '',
         amount: '',
+        free_shipping_threshold: '',
         is_active: false,
         notes: '',
     });
@@ -92,19 +94,39 @@ export default function DeliveryFeesCreate() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="amount">Montant (TND) *</Label>
-                                    <Input
-                                        id="amount"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        placeholder="0.00"
-                                        value={data.amount}
-                                        onChange={(e) => setData('amount', e.target.value)}
-                                        className={errors.amount ? 'border-red-500' : ''}
-                                    />
-                                    {errors.amount && <p className="text-sm text-red-600">{errors.amount}</p>}
+                                <div className="grid gap-6 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="amount">Montant (TND) *</Label>
+                                        <Input
+                                            id="amount"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            placeholder="0.00"
+                                            value={data.amount}
+                                            onChange={(e) => setData('amount', e.target.value)}
+                                            className={errors.amount ? 'border-red-500' : ''}
+                                        />
+                                        {errors.amount && <p className="text-sm text-red-600">{errors.amount}</p>}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="free_shipping_threshold">Seuil de livraison gratuite (TND)</Label>
+                                        <Input
+                                            id="free_shipping_threshold"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            placeholder="Ex: 100.00"
+                                            value={data.free_shipping_threshold}
+                                            onChange={(e) => setData('free_shipping_threshold', e.target.value)}
+                                            className={errors.free_shipping_threshold ? 'border-red-500' : ''}
+                                        />
+                                        {errors.free_shipping_threshold && <p className="text-sm text-red-600">{errors.free_shipping_threshold}</p>}
+                                        <p className="text-xs text-slate-500">
+                                            Montant minimum du panier pour bénéficier de la livraison gratuite. Laissez vide pour désactiver.
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
