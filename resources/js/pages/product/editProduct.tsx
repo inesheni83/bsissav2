@@ -133,7 +133,7 @@ export default function EditProduct() {
             const rawImage = product.image_url ?? product.image ?? null;
 
             if (typeof rawImage === 'string' && rawImage.trim() !== '') {
-                if (/^https?:\/\//i.test(rawImage) || rawImage.startsWith('/')) {
+                if (/^https?:\/\//i.test(rawImage) || rawImage.startsWith('/') || rawImage.startsWith('data:')) {
                     setImagePreview(rawImage);
                 } else {
                     setImagePreview(`/storage/${rawImage}`);

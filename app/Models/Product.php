@@ -163,9 +163,17 @@ class Product extends Model
             return 'data:' . $this->image_mime_type . ';base64,' . $this->image_data;
         }
 
-        // Priority 2: Use file path if available AND file exists
-        if ($this->image && \Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
+        // Priority 2: Use file path if available. Even if the storage symlink is missing,
+        // return the expected public URL so the frontend can still try to display it.
+        if ($this->image) {
+            $normalizedPath = ltrim($this->image, '/');
+
+            if (\Storage::disk('public')->exists($normalizedPath)) {
+                return asset('storage/' . $normalizedPath);
+            }
+
+            // Fallback: build the public asset URL without checking the filesystem
+            return asset('storage/' . $normalizedPath);
         }
 
         return null;
