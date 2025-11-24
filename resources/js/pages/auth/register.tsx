@@ -18,7 +18,8 @@ export default function Register() {
         >
             <Head title="Créer un compte" />
             <Form
-                {...RegisteredUserController.store.form()}
+                action={RegisteredUserController.store().url}
+                method={RegisteredUserController.store().method}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
