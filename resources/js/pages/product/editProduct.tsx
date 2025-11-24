@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, usePage } from '@inertiajs/react';
-import { DragEvent, FormEvent, useCallback, useEffect, useState } from 'react';
+import { DragEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ImagePlus, Loader2, Sparkles, X, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,6 +59,11 @@ export default function EditProduct() {
     const product = props.product;
     const pageErrors = props.errors || {};
 
+    const resolvedCategoryId = useMemo(
+        () => product?.category_id ?? product?.category?.id ?? null,
+        [product]
+    );
+
     const {
         data,
         setData,
@@ -85,8 +90,6 @@ export default function EditProduct() {
         if (!product) return;
 
         setAutoSlug(false);
-
-        const resolvedCategoryId = product.category_id ?? product.category?.id ?? null;
 
         const prefilled: ProductFormData = {
             name: product.name ?? '',
@@ -139,11 +142,17 @@ export default function EditProduct() {
                 setImagePreview(null);
             }
         }
-    }, [product, setAutoSlug, setData, setImagePreview, toStringOrEmpty, selectedImageFile]);
+    }, [product, resolvedCategoryId, setAutoSlug, setData, setImagePreview, toStringOrEmpty, selectedImageFile]);
 
     useEffect(() => {
         hydrateFromProduct();
     }, [hydrateFromProduct]);
+
+    useEffect(() => {
+        if (!data.category_id && resolvedCategoryId !== null) {
+            setData('category_id', String(resolvedCategoryId));
+        }
+    }, [data.category_id, resolvedCategoryId, setData]);
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         submitForm(event, route('products.update', product.id), 'put');
@@ -328,7 +337,8 @@ export default function EditProduct() {
                                         Catégorie <span className="text-red-500">*</span>
                                     </Label>
                                     <Select
-                                        value={data.category_id}
+                                        value={data.category_id || undefined}
+                                        defaultValue={resolvedCategoryId !== null ? String(resolvedCategoryId) : undefined}
                                         onValueChange={(value) => handleFieldChange('category_id', value)}
                                     >
                                         <SelectTrigger className="border-slate-300">
