@@ -65,7 +65,7 @@ type CartPageProps = {
     savedNote: string;
 };
 
-export default function CartPage({ items, summary, deliveryInfo, savedNote }: CartPageProps) {
+export default function CartPage({ items, deliveryInfo, savedNote }: CartPageProps) {
     const { flash } = usePage<SharedData>().props;
     const initialState = useMemo(
         () =>
