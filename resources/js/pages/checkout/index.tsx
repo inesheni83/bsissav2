@@ -44,6 +44,7 @@ interface CheckoutItem {
 interface CheckoutDelivery {
     first_name: string;
     last_name: string;
+    email: string;
     address: string;
     country: string;
     region: string;
@@ -55,6 +56,7 @@ interface CheckoutDelivery {
 
 interface UserInfo {
     name: string;
+    email?: string | null;
     phone?: string | null;
     address_line1?: string | null;
     address_line2?: string | null;
@@ -86,6 +88,7 @@ interface CheckoutProps {
 type CheckoutFormData = {
     first_name: string;
     last_name: string;
+    email: string;
     address: string;
     country: string;
     region: string;
@@ -152,6 +155,7 @@ export default function CheckoutPage({ items, summary, deliveryInfo, delivery, r
     const { data, setData, post, processing, errors } = useForm<CheckoutFormData>({
         first_name: delivery?.first_name ?? firstName,
         last_name: delivery?.last_name ?? lastName,
+        email: delivery?.email ?? userInfo?.email ?? '',
         address: delivery?.address ?? buildAddress(),
         country: delivery?.country ?? userInfo?.country ?? DEFAULT_COUNTRY,
         region: delivery?.region ?? userInfo?.state ?? '',
@@ -285,11 +289,11 @@ export default function CheckoutPage({ items, summary, deliveryInfo, delivery, r
                                 />
                                 {errors.first_name && <p className="text-sm text-red-600">{errors.first_name}</p>}
                             </div>
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-emerald-900" htmlFor="last-name">
-                                    Nom
-                                </label>
-                                <input
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-emerald-900" htmlFor="last-name">
+                                Nom
+                            </label>
+                            <input
                                     id="last-name"
                                     name="last_name"
                                     type="text"
@@ -297,11 +301,27 @@ export default function CheckoutPage({ items, summary, deliveryInfo, delivery, r
                                     value={data.last_name}
                                     onChange={(event) => setData('last_name', event.target.value)}
                                     className="w-full rounded-2xl border border-emerald-200 px-3 py-2 text-sm text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                                    required
-                                />
-                                {errors.last_name && <p className="text-sm text-red-600">{errors.last_name}</p>}
-                            </div>
+                                required
+                            />
+                            {errors.last_name && <p className="text-sm text-red-600">{errors.last_name}</p>}
                         </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-emerald-900" htmlFor="email">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                value={data.email}
+                                onChange={(event) => setData('email', event.target.value)}
+                                className="w-full rounded-2xl border border-emerald-200 px-3 py-2 text-sm text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                                required
+                            />
+                            {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                        </div>
+                    </div>
 
                         <div className="grid gap-2 sm:grid-cols-[120px_1fr] sm:items-start sm:gap-4">
                             <label className="text-sm font-medium text-emerald-900 sm:pt-2" htmlFor="address-line">
@@ -494,6 +514,3 @@ export default function CheckoutPage({ items, summary, deliveryInfo, delivery, r
         </PublicLayout>
     );
 }
-
-
-

@@ -43,6 +43,7 @@ class Order extends Model
         'reference',
         'first_name',
         'last_name',
+        'customer_email',
         'address',
         'country',
         'region',

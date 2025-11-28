@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\Services\TransactionalEmailTemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -41,18 +42,26 @@ class OrderStatusChanged extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $templateService = app(TransactionalEmailTemplateService::class);
         $statusMeta = Order::statusMeta($this->newStatus);
         $oldStatusMeta = Order::statusMeta($this->oldStatus);
 
-        return (new MailMessage)
-            ->subject('Mise à jour de votre commande ' . $this->order->reference)
-            ->greeting('Bonjour ' . $this->order->first_name . ',')
-            ->line('Le statut de votre commande **' . $this->order->reference . '** a été mis à jour.')
-            ->line('**Ancien statut:** ' . $oldStatusMeta['label'])
-            ->line('**Nouveau statut:** ' . $statusMeta['label'])
-            ->line($statusMeta['description'])
-            ->action('Voir ma commande', route('orders.show', $this->order->id))
-            ->line('Merci pour votre confiance !');
+        $templateKey = $this->newStatus === 'delivered'
+            ? TransactionalEmailTemplateService::TEMPLATE_DELIVERY_CONFIRMATION
+            : TransactionalEmailTemplateService::TEMPLATE_STATUS_UPDATE;
+
+        $rendered = $templateService->renderTemplate($templateKey, [
+            'customer_name' => $this->order->first_name,
+            'order_reference' => $this->order->reference,
+            'old_status' => $oldStatusMeta['label'],
+            'new_status' => $statusMeta['label'],
+            'status_label' => $statusMeta['label'],
+            'status_description' => $statusMeta['description'],
+            'order_url' => route('orders.show', $this->order->id),
+            'site_name' => config('app.name'),
+        ]);
+
+        return $this->buildMailMessage($rendered['subject'], $rendered['body']);
     }
 
     /**
@@ -70,5 +79,24 @@ class OrderStatusChanged extends Notification
             'old_status_label' => Order::statusMeta($this->oldStatus)['label'],
             'new_status_label' => Order::statusMeta($this->newStatus)['label'],
         ];
+    }
+
+    private function buildMailMessage(string $subject, string $body): MailMessage
+    {
+        $mailMessage = (new MailMessage())->subject($subject);
+
+        foreach (preg_split("/\r\n|\n|\r/", trim($body)) as $line) {
+            $line = trim($line);
+
+            if ($line === '') {
+                continue;
+            }
+
+            $mailMessage->line($line);
+        }
+
+        $mailMessage->action('Voir ma commande', route('orders.show', $this->order->id));
+
+        return $mailMessage;
     }
 }

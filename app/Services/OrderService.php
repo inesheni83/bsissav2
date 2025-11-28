@@ -10,6 +10,7 @@ use App\Notifications\OrderStatusChanged;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -154,6 +155,9 @@ class OrderService
             // Send notification to customer if they have a user account
             if ($order->user) {
                 $order->user->notify(new OrderStatusChanged($order, $oldStatus, $newStatus));
+            } elseif (!empty($order->customer_email)) {
+                Notification::route('mail', $order->customer_email)
+                    ->notify(new OrderStatusChanged($order, $oldStatus, $newStatus));
             }
 
             // Generate invoice automatically when order is marked as delivered

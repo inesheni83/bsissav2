@@ -7,8 +7,10 @@ use App\Models\DeliveryFee;
 use App\Models\Order;
 use App\Models\Pack;
 use App\Models\Product;
+use App\Notifications\OrderConfirmed;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -176,19 +178,19 @@ class CartService
         $subtotal = (float) $items->sum('total_price');
         $itemsCount = (int) $items->sum('quantity');
 
-        // Récupérer les frais de livraison actifs
+        // Recuperer les frais de livraison actifs
         $activeDeliveryFee = DeliveryFee::where('is_active', true)->first();
         $deliveryFeesId = $activeDeliveryFee?->id;
 
-        return $this->db->transaction(function () use ($owner, $items, $subtotal, $itemsCount, $delivery, $deliveryFeesId) {
-            // Vérifier la disponibilité du stock avant de créer la commande
+        $order = $this->db->transaction(function () use ($owner, $items, $subtotal, $itemsCount, $delivery, $deliveryFeesId) {
+            // Verifier la disponibilite du stock avant de creer la commande
             foreach ($items as $item) {
                 if ($item->pack) {
                     $availableStock = $item->pack->stock_quantity;
                     if ($availableStock < $item->quantity) {
                         throw new \RuntimeException(
                             "Stock insuffisant pour le pack {$item->pack->name}. " .
-                            "Stock disponible: {$availableStock}, Quantité demandée: {$item->quantity}"
+                            "Stock disponible: {$availableStock}, Quantite demandee: {$item->quantity}"
                         );
                     }
                 } elseif ($item->weightVariant) {
@@ -196,7 +198,7 @@ class CartService
                     if ($availableStock < $item->quantity) {
                         throw new \RuntimeException(
                             "Stock insuffisant pour {$item->product->name} - {$item->weightVariant->weight_value}{$item->weightVariant->weight_unit}. " .
-                            "Stock disponible: {$availableStock}, Quantité demandée: {$item->quantity}"
+                            "Stock disponible: {$availableStock}, Quantite demandee: {$item->quantity}"
                         );
                     }
                 }
@@ -208,6 +210,7 @@ class CartService
                 'reference' => $this->generateOrderReference(),
                 'first_name' => $delivery['first_name'],
                 'last_name' => $delivery['last_name'],
+                'customer_email' => $delivery['email'] ?? null,
                 'address' => $delivery['address'],
                 'country' => $delivery['country'],
                 'region' => $delivery['region'],
@@ -251,7 +254,7 @@ class CartService
                 'status' => 'pending',
             ]);
 
-            // Mettre à jour le stock des produits (weight variants) et packs
+            // Mettre a jour le stock des produits (weight variants) et packs
             foreach ($items as $item) {
                 if ($item->pack) {
                     $item->pack->decrement('stock_quantity', $item->quantity);
@@ -266,6 +269,16 @@ class CartService
 
             return $order;
         });
+
+        if ($order->user) {
+            $order->loadMissing('deliveryFee', 'user');
+            $order->user->notify(new OrderConfirmed($order));
+        } elseif (!empty($order->customer_email)) {
+            $order->loadMissing('deliveryFee');
+            Notification::route('mail', $order->customer_email)->notify(new OrderConfirmed($order));
+        }
+
+        return $order;
     }
 
     private function generateOrderReference(): string
@@ -273,3 +286,5 @@ class CartService
         return 'CMD-' . strtoupper(Str::random(10));
     }
 }
+
+

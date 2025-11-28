@@ -105,10 +105,8 @@ export default function OrderDetails() {
             { status: selectedStatus },
             {
                 onSuccess: () => {
-                    alert('Statut mis à jour avec succès');
                 },
                 onError: () => {
-                    alert('Erreur lors de la mise à jour du statut');
                     setSelectedStatus(order.status);
                 },
                 onFinish: () => {

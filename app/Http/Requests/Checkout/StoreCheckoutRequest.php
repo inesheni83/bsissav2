@@ -20,6 +20,7 @@ class StoreCheckoutRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'country' => ['required', 'string', 'max:120', Rule::in(['Tunisie'])],
             'region' => ['required', 'string', 'max:120', Rule::in($regions)],

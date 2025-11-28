@@ -19,6 +19,7 @@ use App\Http\Controllers\GalleryImage\GalleryImageController;
 use App\Http\Controllers\SellerDashboardController;
 use App\Http\Controllers\Settings\SiteSettingsController;
 use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\TransactionalEmail\TransactionalEmailTemplateController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
@@ -97,6 +98,10 @@ Route::middleware(['auth', 'admin.vendeur'])->group(function () {
     Route::get('/admin/gallery-images/{galleryImage}/edit', [GalleryImageController::class, 'edit'])->name('gallery-images.edit');
     Route::put('/admin/gallery-images/{galleryImage}', [GalleryImageController::class, 'update'])->name('gallery-images.update');
     Route::delete('/admin/gallery-images/{galleryImage}', [GalleryImageController::class, 'destroy'])->name('gallery-images.destroy');
+
+    // Admin transactional emails templates
+    Route::get('/admin/transactional-emails', [TransactionalEmailTemplateController::class, 'index'])->name('admin.transactional-emails.index');
+    Route::post('/admin/transactional-emails', [TransactionalEmailTemplateController::class, 'update'])->name('admin.transactional-emails.update');
 
     // Admin customers management routes
     Route::get('/admin/customers', [CustomerController::class, 'index'])->name('admin.customers.index');

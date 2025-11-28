@@ -21,7 +21,7 @@ cmds = [
   # Storage link (force recreation if exists)
   "php artisan storage:link --force || true",
 
-  # Clear all caches first
+  # Clear all caches
   "php artisan config:clear",
   "php artisan route:clear",
   "php artisan view:clear",
@@ -30,8 +30,7 @@ cmds = [
   # Run database migrations
   "php artisan migrate --force",
 
-  # Rebuild caches
-  "php artisan config:cache",
+  # Cache routes and views only (not config to allow dynamic env vars)
   "php artisan route:cache",
   "php artisan view:cache"
 ]

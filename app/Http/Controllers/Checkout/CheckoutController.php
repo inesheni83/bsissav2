@@ -85,6 +85,7 @@ class CheckoutController extends Controller
         if ($user) {
             $userInfo = [
                 'name' => $user->name,
+                'email' => $user->email,
                 'phone' => $user->phone,
                 'address_line1' => $user->address_line1,
                 'address_line2' => $user->address_line2,

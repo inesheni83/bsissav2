@@ -7,7 +7,7 @@ import { index as productsIndex } from '@/routes/products';
 import { index as packsIndex } from '@/routes/packs';
 import { create as createProductRoute } from '@/actions/App/Http/Controllers/Product/AddProductController.ts';
 import { NavItem, type BreadcrumbItem, type SharedData } from '@/types';
-import { LayoutGrid, Layers, PackageSearch, Plus, ShoppingBag, FileText, Truck, Image, Users, Settings, Package } from 'lucide-react';
+import { LayoutGrid, Layers, PackageSearch, Plus, ShoppingBag, FileText, Truck, Image, Users, Settings, Package, Mail } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 import { usePage } from '@inertiajs/react';
 
@@ -51,6 +51,11 @@ const mainNavItems: NavItem[] = [
         title: 'Galerie d\'images',
         href: '/admin/gallery-images',
         icon: Image,
+    },
+    {
+        title: 'Emails transactionnels',
+        href: '/admin/transactional-emails',
+        icon: Mail,
     },
     {
         title: 'Gestion des clients',
