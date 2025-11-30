@@ -219,8 +219,12 @@ export default function PackPublicIndex({ packs, filters }: PageProps) {
 
                                         {/* Badge Stock en haut à droite */}
                                         <div className="absolute top-3 right-3">
-                                            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-white/90 px-3 py-1 text-xs font-semibold text-emerald-900 shadow-sm">
-                                                Stock {pack.stock_quantity > 0 ? `${pack.stock_quantity}` : 'Rupture'}
+                                            <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold shadow-sm ${
+                                                pack.stock_quantity > 0
+                                                    ? 'border-emerald-200 bg-white/90 text-emerald-900'
+                                                    : 'border-red-200 bg-red-50/90 text-red-700'
+                                            }`}>
+                                                {pack.stock_quantity > 0 ? 'En stock' : 'Rupture de stock'}
                                             </span>
                                         </div>
 

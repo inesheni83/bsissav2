@@ -244,19 +244,9 @@ export default function PackPublicShow({ pack, similarPacks }: PageProps) {
 
                             {/* Stock Info */}
                             {pack.stock_quantity > 0 ? (
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <Check className="h-5 w-5 text-emerald-600" />
-                                        <span className="text-slate-700 font-medium">
-                                            En stock ({pack.stock_quantity} disponible{pack.stock_quantity > 1 ? 's' : ''})
-                                        </span>
-                                    </div>
-                                    {pack.stock_quantity < 10 && (
-                                        <div className="flex items-center gap-2 text-orange-600">
-                                            <AlertCircle className="h-5 w-5" />
-                                            <span className="font-medium">Plus que {pack.stock_quantity} en stock !</span>
-                                        </div>
-                                    )}
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-5 w-5 text-emerald-600" />
+                                    <span className="text-slate-700 font-medium">En stock</span>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 text-red-600">
