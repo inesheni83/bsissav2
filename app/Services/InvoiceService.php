@@ -91,6 +91,13 @@ class InvoiceService
             $query->where('invoice_number', 'like', "%{$filters['invoice_number']}%");
         }
 
+        // Filter by order reference
+        if (!empty($filters['order_reference'])) {
+            $query->whereHas('order', function ($q) use ($filters) {
+                $q->where('reference', 'like', "%{$filters['order_reference']}%");
+            });
+        }
+
         // Filter by client name
         if (!empty($filters['client_name'])) {
             $query->where('client_name', 'like', "%{$filters['client_name']}%");

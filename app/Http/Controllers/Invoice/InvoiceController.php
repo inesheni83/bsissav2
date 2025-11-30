@@ -24,7 +24,7 @@ class InvoiceController extends Controller
      */
     public function index(Request $request): Response
     {
-        $filters = $request->only(['invoice_number', 'client_name', 'status', 'payment_status', 'date_from', 'date_to']);
+        $filters = $request->only(['invoice_number', 'order_reference', 'client_name', 'status', 'payment_status', 'date_from', 'date_to']);
 
         $invoices = $this->invoiceService->getFilteredInvoices($filters)
             ->paginate(10)

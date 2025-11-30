@@ -85,6 +85,38 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
         });
     };
 
+    const filterByStats = (filterType: 'all' | 'new_this_month' | 'active' | 'repeat') => {
+        let newFilters: Filters = {};
+
+        switch (filterType) {
+            case 'new_this_month':
+                const now = new Date();
+                const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                newFilters = {
+                    date_from: firstDayOfMonth.toISOString().split('T')[0],
+                    date_to: lastDayOfMonth.toISOString().split('T')[0],
+                };
+                break;
+            case 'active':
+                newFilters = { min_orders: '1' };
+                break;
+            case 'repeat':
+                newFilters = { min_orders: '2' };
+                break;
+            case 'all':
+            default:
+                newFilters = {};
+                break;
+        }
+
+        setFilters(newFilters);
+        router.get(route('admin.customers.index'), newFilters, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
     const exportCustomers = () => {
         window.location.href = route('admin.customers.export', filters);
     };
@@ -131,7 +163,10 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     {/* Statistics Cards */}
                     <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        <Card className="border-l-4 border-l-blue-500">
+                        <Card
+                            className="cursor-pointer border-l-4 border-l-blue-500 transition-all hover:shadow-md hover:scale-105"
+                            onClick={() => filterByStats('all')}
+                        >
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -143,7 +178,10 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                             </CardContent>
                         </Card>
 
-                        <Card className="border-l-4 border-l-green-500">
+                        <Card
+                            className="cursor-pointer border-l-4 border-l-green-500 transition-all hover:shadow-md hover:scale-105"
+                            onClick={() => filterByStats('new_this_month')}
+                        >
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -155,7 +193,10 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                             </CardContent>
                         </Card>
 
-                        <Card className="border-l-4 border-l-emerald-500">
+                        <Card
+                            className="cursor-pointer border-l-4 border-l-emerald-500 transition-all hover:shadow-md hover:scale-105"
+                            onClick={() => filterByStats('active')}
+                        >
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -167,7 +208,10 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                             </CardContent>
                         </Card>
 
-                        <Card className="border-l-4 border-l-amber-500">
+                        <Card
+                            className="cursor-pointer border-l-4 border-l-amber-500 transition-all hover:shadow-md hover:scale-105"
+                            onClick={() => filterByStats('repeat')}
+                        >
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>

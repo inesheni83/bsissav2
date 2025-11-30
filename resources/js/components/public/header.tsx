@@ -92,7 +92,6 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
         const baseLinks: MenuLink[] = [
             { name: 'Accueil', href: home().url },
             { name: 'Packs', href: '/packs' },
-            { name: 'Recettes', href: '/recipes' },
         ];
 
         if (canAccessSellerArea) {

@@ -66,6 +66,7 @@ type Stats = {
 
 type Filters = {
     invoice_number?: string;
+    order_reference?: string;
     client_name?: string;
     status?: string;
     payment_status?: string;
@@ -308,6 +309,20 @@ export default function InvoiceList() {
                                                 placeholder="INV-2025-000001"
                                                 value={filters.invoice_number || ''}
                                                 onChange={(e) => handleFilterChange('invoice_number', e.target.value)}
+                                                className="pl-10"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="order_reference">Référence commande</Label>
+                                        <div className="relative">
+                                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                            <Input
+                                                id="order_reference"
+                                                placeholder="CMD-2025-000001"
+                                                value={filters.order_reference || ''}
+                                                onChange={(e) => handleFilterChange('order_reference', e.target.value)}
                                                 className="pl-10"
                                             />
                                         </div>
