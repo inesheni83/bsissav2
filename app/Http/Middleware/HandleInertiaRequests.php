@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Category;
 use App\Services\CartService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -41,6 +42,9 @@ class HandleInertiaRequests extends Middleware
         $cartService = app(CartService::class);
         $cartSummary = $cartService->getSummary();
 
+        // Récupérer les catégories pour le menu de navigation
+        $categories = Category::select(['id', 'name'])->orderBy('name')->get();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -54,6 +58,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
             ],
             'cart' => $cartSummary,
+            'categories' => $categories,
         ];
     }
 }

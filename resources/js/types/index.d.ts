@@ -22,6 +22,11 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface Category {
+    id: number;
+    name: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
@@ -35,6 +40,7 @@ export interface SharedData {
         subtotal: number;
         items_count: number;
     };
+    categories?: Category[];
     [key: string]: unknown;
 }
 

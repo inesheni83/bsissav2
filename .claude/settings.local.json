@@ -9,7 +9,8 @@
       "Bash(npm run build:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(powershell -Command \"Get-Content storage\\logs\\laravel.log -Tail 100 | Select-String -Pattern ''mail|Mail|notification|Notification|OrderConfirmed|OrderStatusChanged''\")"
+      "Bash(powershell -Command \"Get-Content storage\\logs\\laravel.log -Tail 100 | Select-String -Pattern ''mail|Mail|notification|Notification|OrderConfirmed|OrderStatusChanged''\")",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []

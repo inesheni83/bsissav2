@@ -50,14 +50,11 @@ class Pack extends Model
 
     /**
      * Accessor pour l'URL de l'image principale
+     * Utilise le chemin du fichier au lieu des données base64 pour éviter les problèmes de mémoire
      */
     public function getMainImageUrlAttribute(): ?string
     {
-        if ($this->main_image_data && $this->main_image_mime_type) {
-            return 'data:' . $this->main_image_mime_type . ';base64,' . $this->main_image_data;
-        }
-
-        if ($this->main_image && \Storage::disk('public')->exists($this->main_image)) {
+        if ($this->main_image) {
             return asset('storage/' . $this->main_image);
         }
 

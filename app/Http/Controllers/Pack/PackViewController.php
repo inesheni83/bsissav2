@@ -15,7 +15,9 @@ class PackViewController extends Controller
      */
     public function index(Request $request): Response
     {
+        // Exclure les colonnes de données binaires volumineuses (base64)
         $query = Pack::query()
+            ->select(['id', 'name', 'slug', 'description', 'main_image', 'price', 'reference_price', 'is_active', 'stock_quantity', 'created_at'])
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0)
             ->withCount('products');
@@ -115,7 +117,8 @@ class PackViewController extends Controller
         $priceMin = $pack->price * 0.8; // -20%
         $priceMax = $pack->price * 1.2; // +20%
 
-        $similarPacks = Pack::where('is_active', true)
+        $similarPacks = Pack::select(['id', 'name', 'slug', 'description', 'main_image', 'price', 'reference_price', 'is_active', 'stock_quantity', 'created_at'])
+            ->where('is_active', true)
             ->where('stock_quantity', '>', 0)
             ->where('id', '!=', $pack->id)
             ->whereBetween('price', [$priceMin, $priceMax])

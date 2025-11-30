@@ -44,7 +44,7 @@ type DeliveryInfo = {
 
 export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSettings }) {
     const page = usePage<SharedData & { deliveryInfo?: DeliveryInfo }>();
-    const { auth, cart, deliveryInfo } = page.props;
+    const { auth, cart, deliveryInfo, categories } = page.props;
     const currentUrl = page.url;
     const userRole = auth?.user?.role;
     const canAccessSellerArea = userRole === 'admin' || userRole === 'vendeur';
@@ -53,14 +53,20 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
+    const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
 
     const userMenuRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const productsMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
                 setIsUserMenuOpen(false);
+            }
+            if (productsMenuRef.current && !productsMenuRef.current.contains(event.target as Node)) {
+                setIsProductsMenuOpen(false);
             }
         }
 
@@ -164,7 +170,62 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
 
                         <nav className="hidden lg:block">
                             <ul className="flex items-center gap-1 text-sm">
-                                {menuLinks.map((item) => (
+                                {/* Lien Accueil */}
+                                <li>
+                                    <Link
+                                        href={home().url}
+                                        className={`group relative flex items-center gap-1 rounded-full px-4 py-2 font-medium transition ${
+                                            isActive(home().url)
+                                                ? 'bg-white/15 text-white shadow shadow-emerald-900/30'
+                                                : 'text-emerald-100/80 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                    >
+                                        Accueil
+                                        <span
+                                            className={`pointer-events-none absolute inset-x-4 bottom-1 h-px rounded-full transition-transform duration-200 group-hover:scale-x-100 ${
+                                                isActive(home().url) ? 'scale-x-100 bg-amber-400/80' : 'scale-x-0 bg-emerald-100/60'
+                                            }`}
+                                            aria-hidden="true"
+                                        />
+                                    </Link>
+                                </li>
+
+                                {/* Menu déroulant Produits */}
+                                <li className="relative" ref={productsMenuRef}>
+                                    <button
+                                        onClick={() => setIsProductsMenuOpen((value) => !value)}
+                                        className={`group relative flex items-center gap-1 rounded-full px-4 py-2 font-medium transition ${
+                                            currentUrl?.includes('category_id')
+                                                ? 'bg-white/15 text-white shadow shadow-emerald-900/30'
+                                                : 'text-emerald-100/80 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                        aria-haspopup="menu"
+                                        aria-expanded={isProductsMenuOpen}
+                                    >
+                                        Produits
+                                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isProductsMenuOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {isProductsMenuOpen && categories && categories.length > 0 && (
+                                        <div className="absolute left-0 mt-3 w-56 rounded-2xl border border-white/10 bg-emerald-950/95 p-2 text-sm shadow-xl shadow-emerald-950/40 backdrop-blur">
+                                            <div className="space-y-1">
+                                                {categories.map((category) => (
+                                                    <Link
+                                                        key={category.id}
+                                                        href={`/?category_id=${category.id}`}
+                                                        className="flex items-center justify-between rounded-lg px-3 py-2 text-emerald-50/90 transition hover:bg-white/10 hover:text-white"
+                                                        onClick={() => setIsProductsMenuOpen(false)}
+                                                    >
+                                                        {category.name}
+                                                        <ArrowRight className="h-3.5 w-3.5 text-emerald-100/60" />
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </li>
+
+                                {/* Autres liens du menu */}
+                                {menuLinks.filter(item => item.name !== 'Accueil').map((item) => (
                                     <li key={item.name}>
                                         <Link
                                             href={item.href}
@@ -308,8 +369,50 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
                     />
                     <nav className="fixed inset-y-0 right-0 z-50 w-80 max-w-full overflow-y-auto bg-emerald-950 px-6 pb-12 pt-24 shadow-2xl shadow-emerald-950/60">
                         <div className="space-y-6">
-                            <div className="space-y-4">
-                                {menuLinks.map((item) => (
+                            <div className="space-y-2">
+                                {/* Lien Accueil */}
+                                <Link
+                                    href={home().url}
+                                    className={`block rounded-2xl px-4 py-3 text-base font-semibold transition ${
+                                        isActive(home().url) ? 'bg-white/15 text-white shadow shadow-emerald-900/30' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white'
+                                    }`}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Accueil
+                                </Link>
+
+                                {/* Menu Produits avec catégories */}
+                                <div>
+                                    <button
+                                        onClick={() => setIsMobileProductsOpen((value) => !value)}
+                                        className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-base font-semibold transition ${
+                                            currentUrl?.includes('category_id')
+                                                ? 'bg-white/15 text-white shadow shadow-emerald-900/30'
+                                                : 'text-emerald-100/80 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                    >
+                                        Produits
+                                        <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isMobileProductsOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {isMobileProductsOpen && categories && categories.length > 0 && (
+                                        <div className="mt-2 space-y-1 pl-4">
+                                            {categories.map((category) => (
+                                                <Link
+                                                    key={category.id}
+                                                    href={`/?category_id=${category.id}`}
+                                                    className="flex items-center justify-between rounded-xl px-4 py-2 text-sm text-emerald-100/80 transition hover:bg-white/10 hover:text-white"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                >
+                                                    {category.name}
+                                                    <ArrowRight className="h-3.5 w-3.5 text-emerald-100/60" />
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Autres liens du menu */}
+                                {menuLinks.filter(item => item.name !== 'Accueil').map((item) => (
                                     <Link
                                         key={item.name}
                                         href={item.href}
@@ -338,7 +441,7 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
                             </div>
 
                             <Link
-                                href="/products"
+                                href="/"
                                 onClick={() => setIsMenuOpen(false)}
                                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-base font-semibold text-emerald-950 shadow-lg shadow-amber-500/30 transition hover:bg-amber-400"
                             >
