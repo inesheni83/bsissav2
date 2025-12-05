@@ -179,7 +179,8 @@ CREATE TABLE IF NOT EXISTS `products` (
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
 
-  INDEX `idx_name_description` (`name`, `description`),
+  INDEX `idx_name_description` (`name`, `description`(255)),
+  FULLTEXT INDEX `idx_products_search` (`name`, `description`),
   INDEX `idx_category_id` (`category_id`),
   INDEX `idx_is_featured` (`is_featured`),
   INDEX `idx_created_at` (`created_at`),

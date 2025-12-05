@@ -33,10 +33,12 @@ class HomeController extends Controller
             $filters['featured'] = '1';
         }
 
+        // Récupérer les produits (sans cache pour éviter les problèmes de mémoire avec base64)
         $productsQuery = $this->productService->getFilteredProducts($filters);
         $products = $productsQuery->paginate(12)->withQueryString();
 
         // Formater les données des produits avec les weight variants
+        // IMPORTANT: Ne pas mettre en cache car image_url contient du base64 très lourd
         $products->getCollection()->transform(function ($product) {
             return [
                 'id' => $product->id,
@@ -61,12 +63,12 @@ class HomeController extends Controller
             ];
         });
 
-        $categories = Cache::remember('home_categories_list', 60, function () {
+        $categories = Cache::remember('home_categories_list', 3600, function () {
             return Category::orderBy('name')->get(['id', 'name']);
         });
 
         // Récupérer les images de la galerie pour le carrousel hero
-        $galleryImages = Cache::remember('home_gallery_images', 60, function () {
+        $galleryImages = Cache::remember('home_gallery_images', 3600, function () {
             return GalleryImage::ordered()
                 ->get()
                 ->map(function ($image) {
@@ -80,9 +82,13 @@ class HomeController extends Controller
 
         $siteSettings = $this->siteSettingsService->getSettings();
 
-        // Calculer les frais de livraison pour afficher le message de livraison gratuite
-        $summary = $this->cartService->getSummary();
-        $deliveryInfo = $this->deliveryFeeService->calculateDeliveryFee($summary['subtotal']);
+        // Calculer les frais de livraison uniquement si le panier contient des items
+        // Cela évite des requêtes inutiles pour les utilisateurs sans panier
+        $deliveryInfo = null;
+        if (session()->has('cart_items_count') && session('cart_items_count') > 0) {
+            $summary = $this->cartService->getSummary();
+            $deliveryInfo = $this->deliveryFeeService->calculateDeliveryFee($summary['subtotal']);
+        }
 
         return Inertia::render('homepage', [
             'products' => $products,

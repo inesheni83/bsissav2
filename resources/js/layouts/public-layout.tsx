@@ -21,8 +21,15 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900">
+            {/* Skip to main content link for accessibility */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-emerald-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            >
+                Aller au contenu principal
+            </a>
             <PublicHeader siteSettings={siteSettings} />
-            <main>{children}</main>
+            <main id="main-content" role="main" tabIndex={-1}>{children}</main>
             <PublicFooter siteSettings={siteSettings} />
         </div>
     );

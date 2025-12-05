@@ -150,10 +150,17 @@ class ProductService
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
+            // Utiliser la recherche FULLTEXT pour de meilleures performances
+            // Si le terme de recherche contient plusieurs mots, utiliser FULLTEXT
+            // Sinon, utiliser LIKE pour les recherches simples
+            if (str_word_count($search) > 1) {
+                $query->whereRaw('MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)', [$search]);
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
         }
 
         if (!empty($filters['category_id'])) {

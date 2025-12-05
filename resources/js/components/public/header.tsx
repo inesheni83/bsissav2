@@ -144,14 +144,14 @@ export default function PublicHeader({ siteSettings }: { siteSettings?: SiteSett
                                     {siteSettings.contact_email}
                                 </a>
                             )}
-                            {deliveryInfo?.threshold !== null && (
+                            {deliveryInfo && deliveryInfo.threshold !== null && deliveryInfo.threshold > 0 && (
                                 <div className="flex items-center gap-2">
                                     <ShoppingCart className="h-4 w-4 text-amber-300" />
                                     <span>Plus que {Math.round(deliveryInfo.threshold)} TND pour bénéficier de la livraison gratuite !</span>
                                 </div>
                             )}
                         </div>
-                        <p className="hidden xl:block text-emerald-100/60">Saveurs authentiques de Tunisie · Livraison express en 24h</p>
+                        <p className="hidden xl:block text-emerald-100/90">Saveurs authentiques de Tunisie · Livraison express en 24h</p>
                     </div>
                 </div>
             )}

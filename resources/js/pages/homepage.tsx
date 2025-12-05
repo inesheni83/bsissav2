@@ -82,6 +82,18 @@ export default function Homepage({ products, categories, galleryImages, filters 
         });
     }, [products.data]);
 
+    // Close filters modal with ESC key for better accessibility
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && filtersOpen) {
+                setFiltersOpen(false);
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [filtersOpen]);
+
     const { data, setData, get } = useForm({
         search: filters.search || '',
         category_id: filters.category_id ? String(filters.category_id) : '',
@@ -181,11 +193,89 @@ export default function Homepage({ products, categories, galleryImages, filters 
 
     return (
         <>
-            <Head title="Accueil">
+            <Head title="Accueil - Bsissa Trésors du Terroir | Produits Tunisiens 100% Naturels">
+                {/* Fonts */}
                 <link rel="preconnect" href="https://fonts.bunny.net" />
+                <link rel="dns-prefetch" href="https://fonts.bunny.net" />
+                <link rel="preload" as="style" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" />
+                <link rel="preload" as="style" href="https://fonts.bunny.net/css?family=playfair-display:400,600,700,800" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
                 <link href="https://fonts.bunny.net/css?family=playfair-display:400,600,700,800" rel="stylesheet" />
-                <meta name="description" content="Decouvrez nos produits et nos meilleures recettes." />
+
+                {/* Preload LCP image (first hero carousel image) */}
+                {galleryImages.length > 0 && galleryImages[0].image_url && (
+                    <link
+                        rel="preload"
+                        as="image"
+                        href={galleryImages[0].image_url}
+                        fetchPriority="high"
+                    />
+                )}
+
+                {/* SEO Meta Tags */}
+                <meta name="description" content="Découvrez la Bsissa, superaliment tunisien traditionnel 100% naturel et vegan. Recette ancestrale de 3000 ans, fait maison avec des ingrédients premium. Livraison rapide en Tunisie." />
+                <meta name="keywords" content="bsissa, bsissa tunisienne, superaliment tunisien, produits naturels, vegan, fait maison, nutrition tunisie" />
+                <link rel="canonical" href={typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''} />
+
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+                <meta property="og:title" content="Bsissa - Trésors du Terroir Tunisien | 100% Naturel & Vegan" />
+                <meta property="og:description" content="Découvrez la Bsissa, un superaliment tunisien traditionnel qui nourrit votre corps et éveille vos sens. Recette ancestrale, 100% naturel, 100% vegan." />
+                <meta property="og:image" content={typeof window !== 'undefined' ? window.location.origin + '/images/og-image.jpg' : ''} />
+                <meta property="og:locale" content="fr_FR" />
+                <meta property="og:site_name" content="Bsissa - Trésors du Terroir" />
+
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+                <meta name="twitter:title" content="Bsissa - Trésors du Terroir Tunisien | 100% Naturel & Vegan" />
+                <meta name="twitter:description" content="Découvrez la Bsissa, superaliment tunisien traditionnel. 3000 ans d'histoire, 0% additifs, 100% fait maison." />
+                <meta name="twitter:image" content={typeof window !== 'undefined' ? window.location.origin + '/images/og-image.jpg' : ''} />
+
+                {/* Additional SEO */}
+                <meta name="robots" content="index, follow" />
+                <meta name="author" content="Bsissa - Trésors du Terroir" />
+                <meta name="geo.region" content="TN" />
+                <meta name="geo.placename" content="Tunisie" />
+
+                {/* Schema.org JSON-LD for SEO */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        "name": "Bsissa - Trésors du Terroir",
+                        "url": typeof window !== 'undefined' ? window.location.origin : '',
+                        "description": "Superaliment tunisien traditionnel 100% naturel et vegan",
+                        "potentialAction": {
+                            "@type": "SearchAction",
+                            "target": {
+                                "@type": "EntryPoint",
+                                "urlTemplate": typeof window !== 'undefined' ? `${window.location.origin}/?search={search_term_string}` : ''
+                            },
+                            "query-input": "required name=search_term_string"
+                        }
+                    })}
+                </script>
+
+                {/* Organization Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Organization",
+                        "name": "Bsissa - Trésors du Terroir",
+                        "url": typeof window !== 'undefined' ? window.location.origin : '',
+                        "logo": typeof window !== 'undefined' ? `${window.location.origin}/images/logo.png` : '',
+                        "description": "Producteur et distributeur de Bsissa traditionnelle tunisienne",
+                        "address": {
+                            "@type": "PostalAddress",
+                            "addressCountry": "TN",
+                            "addressRegion": "Tunisie"
+                        },
+                        "areaServed": "TN"
+                    })}
+                </script>
+
                 <style>{`
                     @keyframes fadeInUp {
                         from {
@@ -195,6 +285,18 @@ export default function Homepage({ products, categories, galleryImages, filters 
                         to {
                             opacity: 1;
                             transform: translateY(0);
+                        }
+                    }
+
+                    /* Respect user's motion preferences */
+                    @media (prefers-reduced-motion: reduce) {
+                        *,
+                        *::before,
+                        *::after {
+                            animation-duration: 0.01ms !important;
+                            animation-iteration-count: 1 !important;
+                            transition-duration: 0.01ms !important;
+                            scroll-behavior: auto !important;
                         }
                     }
                 `}</style>
@@ -357,7 +459,10 @@ export default function Homepage({ products, categories, galleryImages, filters 
                                                         {product.image_url ? (
                                                             <img
                                                                 src={product.image_url}
-                                                                alt={product.name}
+                                                                alt={`${product.name} - ${description.slice(0, 50)}${description.length > 50 ? '...' : ''}`}
+                                                                width="400"
+                                                                height="256"
+                                                                loading="lazy"
                                                                 className="w-full h-64 object-cover transition-transform duration-500 hover:scale-105"
                                                             />
                                                         ) : (
@@ -401,12 +506,14 @@ export default function Homepage({ products, categories, galleryImages, filters 
 
                                                         {/* Boutons de sélection des poids */}
                                                         {sortedVariants.length > 0 && (
-                                                            <div className="flex flex-wrap gap-2">
+                                                            <div className="flex flex-wrap gap-2" role="group" aria-label="Sélectionner le poids du produit">
                                                                 {sortedVariants.map((variant) => (
                                                                     <button
                                                                         key={variant.id}
                                                                         type="button"
                                                                         onClick={() => setSelectedVariants(prev => ({ ...prev, [product.id]: variant.id }))}
+                                                                        aria-label={`Sélectionner le poids ${variant.weight_value} ${variant.weight_unit}${variant.promotional_price ? ` à ${variant.promotional_price.toFixed(2)} TND` : ` à ${variant.price.toFixed(2)} TND`}`}
+                                                                        aria-pressed={selectedVariant?.id === variant.id}
                                                                         className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                                                                             selectedVariant?.id === variant.id
                                                                                 ? 'border-emerald-600 bg-emerald-600 text-white shadow-md'
