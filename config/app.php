@@ -125,4 +125,21 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Image Storage Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These options control where uploaded images are stored for different
+    | entities (products, packs, gallery). All paths are relative to the
+    | public storage disk.
+    |
+    */
+
+    'product_image_path' => env('PRODUCT_IMAGE_PATH', 'products'),
+    'pack_image_path' => env('PACK_IMAGE_PATH', 'packs'),
+    'gallery_image_path' => env('GALLERY_IMAGE_PATH', 'gallery'),
+    'image_max_size' => env('IMAGE_MAX_SIZE', 5120), // in KB
+    'image_allowed_types' => explode(',', env('IMAGE_ALLOWED_TYPES', 'jpg,jpeg,png,webp')),
+
 ];

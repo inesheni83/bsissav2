@@ -153,26 +153,16 @@ class Product extends Model
     }
 
     /**
-     * Get the image URL. Returns base64 data URI if image_data exists,
-     * otherwise returns the file path (only if file exists).
+     * Get the image URL from the physical file path.
+     * No more base64 - images are stored on disk only for better performance.
      */
     public function getImageUrlAttribute(): ?string
     {
-        // Priority 1: Use base64 image from database if available
-        if ($this->image_data && $this->image_mime_type) {
-            return 'data:' . $this->image_mime_type . ';base64,' . $this->image_data;
-        }
-
-        // Priority 2: Use file path if available. Even if the storage symlink is missing,
-        // return the expected public URL so the frontend can still try to display it.
+        // Use file path if available
         if ($this->image) {
             $normalizedPath = ltrim($this->image, '/');
 
-            if (\Storage::disk('public')->exists($normalizedPath)) {
-                return asset('storage/' . $normalizedPath);
-            }
-
-            // Fallback: build the public asset URL without checking the filesystem
+            // Return the public asset URL
             return asset('storage/' . $normalizedPath);
         }
 

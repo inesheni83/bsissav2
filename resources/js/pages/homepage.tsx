@@ -437,14 +437,8 @@ export default function Homepage({ products, categories, galleryImages, filters 
                                             const description = product.description || 'Delicieuse Bsissa artisanale, ideale pour bien demarrer la journee.';
                                             const quantity = quantities[product.id] ?? 1;
 
-                                            // Trier les variantes par poids (du plus petit au plus grand)
-                                            const sortedVariants = !product.weight_variants || product.weight_variants.length === 0
-                                                ? []
-                                                : [...product.weight_variants].sort((a, b) => {
-                                                    const aWeightInGrams = a.weight_unit === 'kg' ? a.weight_value * 1000 : a.weight_value;
-                                                    const bWeightInGrams = b.weight_unit === 'kg' ? b.weight_value * 1000 : b.weight_value;
-                                                    return aWeightInGrams - bWeightInGrams;
-                                                });
+                                            // Les variantes sont déjà triées par poids côté serveur (optimisation)
+                                            const sortedVariants = product.weight_variants || [];
 
                                             // Sélectionner la première variante par défaut
                                             const selectedVariantId = selectedVariants[product.id] ?? sortedVariants[0]?.id;

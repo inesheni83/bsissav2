@@ -24,11 +24,11 @@ class ProductService
     {
         return DB::transaction(function () use ($data, $image) {
             if ($image) {
-                // Save image to database as base64
-                $imageData = $this->convertImageToBase64($image);
-                $data['image'] = $this->handleImageUpload($image); // Keep path for backwards compatibility
-                $data['image_data'] = $imageData['base64'];
-                $data['image_mime_type'] = $imageData['mime_type'];
+                // Save image to disk only (no more base64 in database)
+                $data['image'] = $this->handleImageUpload($image);
+                // Remove base64 fields - no longer needed
+                $data['image_data'] = null;
+                $data['image_mime_type'] = null;
             }
 
             // Extract weight variants data before creating product
@@ -58,11 +58,11 @@ class ProductService
                     Storage::disk('public')->delete($product->image);
                 }
 
-                // Save new image to database as base64
-                $imageData = $this->convertImageToBase64($image);
-                $data['image'] = $image->store('products', 'public'); // Keep path for backwards compatibility
-                $data['image_data'] = $imageData['base64'];
-                $data['image_mime_type'] = $imageData['mime_type'];
+                // Save new image to disk only (no more base64 in database)
+                $data['image'] = $this->handleImageUpload($image);
+                // Clear base64 fields - no longer needed
+                $data['image_data'] = null;
+                $data['image_mime_type'] = null;
             } else {
                 unset($data['image']);
                 unset($data['image_data']);
@@ -118,27 +118,14 @@ class ProductService
 
     /**
      * Store an uploaded product image and return its path.
+     * Uses the configurable path from .env (PRODUCT_IMAGE_PATH)
      */
     private function handleImageUpload(UploadedFile $image): string
     {
+        $path = config('app.product_image_path', 'products');
         $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
-        return $image->storeAs('products', $filename, 'public');
-    }
-
-    /**
-     * Convert an uploaded image to base64 for database storage.
-     */
-    private function convertImageToBase64(UploadedFile $image): array
-    {
-        $imageContent = file_get_contents($image->getRealPath());
-        $base64 = base64_encode($imageContent);
-        $mimeType = $image->getMimeType();
-
-        return [
-            'base64' => $base64,
-            'mime_type' => $mimeType,
-        ];
+        return $image->storeAs($path, $filename, 'public');
     }
 
     /**

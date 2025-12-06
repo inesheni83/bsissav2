@@ -33,12 +33,19 @@ class HomeController extends Controller
             $filters['featured'] = '1';
         }
 
-        // Récupérer les produits (sans cache pour éviter les problèmes de mémoire avec base64)
+        // Récupérer les produits avec select explicite pour exclure les champs lourds
         $productsQuery = $this->productService->getFilteredProducts($filters);
+
+        // Exclure les champs image_data et image_mime_type qui ne sont plus utilisés
+        $productsQuery->select([
+            'id', 'name', 'slug', 'description', 'image', 'category_id',
+            'is_featured', 'created_at', 'updated_at'
+        ]);
+
         $products = $productsQuery->paginate(12)->withQueryString();
 
         // Formater les données des produits avec les weight variants
-        // IMPORTANT: Ne pas mettre en cache car image_url contient du base64 très lourd
+        // Plus de base64 - les images sont sur disque, donc cache possible
         $products->getCollection()->transform(function ($product) {
             return [
                 'id' => $product->id,
@@ -46,20 +53,25 @@ class HomeController extends Controller
                 'description' => $product->description,
                 'image' => $product->image,
                 'image_url' => $product->image_url,
-                'price' => (float) $product->price,
-                'promotional_price' => $product->promotional_price ? (float) $product->promotional_price : null,
                 'category' => $product->category?->only(['id', 'name']),
                 'is_featured' => $product->is_featured,
-                'stock_quantity' => $product->stock_quantity,
-                'weight_variants' => $product->weightVariants->map(fn($variant) => [
-                    'id' => $variant->id,
-                    'weight_value' => $variant->weight_value,
-                    'weight_unit' => $variant->weight_unit,
-                    'price' => (float) $variant->price,
-                    'promotional_price' => $variant->promotional_price ? (float) $variant->promotional_price : null,
-                    'stock_quantity' => $variant->stock_quantity,
-                    'is_available' => $variant->is_available,
-                ]),
+                'weight_variants' => $product->weightVariants
+                    ->sortBy(function ($variant) {
+                        // Pré-trier les variantes par poids côté serveur
+                        return $variant->weight_unit === 'kg'
+                            ? $variant->weight_value * 1000
+                            : $variant->weight_value;
+                    })
+                    ->values()
+                    ->map(fn($variant) => [
+                        'id' => $variant->id,
+                        'weight_value' => $variant->weight_value,
+                        'weight_unit' => $variant->weight_unit,
+                        'price' => (float) $variant->price,
+                        'promotional_price' => $variant->promotional_price ? (float) $variant->promotional_price : null,
+                        'stock_quantity' => $variant->stock_quantity,
+                        'is_available' => $variant->is_available,
+                    ]),
             ];
         });
 
