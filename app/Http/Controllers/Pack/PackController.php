@@ -25,7 +25,12 @@ class PackController extends Controller
     {
         $this->authorize('viewAny', Pack::class);
 
-        $packs = Pack::withCount('products')
+        $packs = Pack::select([
+                'id', 'name', 'slug', 'description', 'main_image',
+                'price', 'reference_price', 'is_active', 'stock_quantity',
+                'created_by', 'updated_by', 'created_at', 'updated_at'
+            ])
+            ->withCount('products')
             ->with('creator:id,name')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
@@ -43,8 +48,9 @@ class PackController extends Controller
         $this->authorize('create', Pack::class);
 
         // Récupérer les produits disponibles pour le vendeur ou admin avec optimisation
+        // Exclure les champs base64 qui ne sont plus utilisés
         $user = Auth::user();
-        $productsQuery = Product::select(['id', 'name', 'slug', 'image', 'image_data', 'image_mime_type', 'category_id'])
+        $productsQuery = Product::select(['id', 'name', 'slug', 'image', 'category_id'])
             ->with([
                 'category:id,name',
                 'weightVariants' => function ($query) {
@@ -136,15 +142,15 @@ class PackController extends Controller
     {
         $this->authorize('update', $pack);
 
-        // Charger les produits du pack avec leurs images
+        // Charger les produits du pack avec leurs images (exclure base64)
         $pack->load(['products' => function ($query) {
-            $query->select(['products.id', 'products.name', 'products.slug', 'products.image', 'products.image_data', 'products.image_mime_type'])
+            $query->select(['products.id', 'products.name', 'products.slug', 'products.image'])
                 ->withPivot('quantity');
         }]);
 
-        // Récupérer les produits disponibles avec optimisation
+        // Récupérer les produits disponibles avec optimisation (exclure base64)
         $user = Auth::user();
-        $productsQuery = Product::select(['id', 'name', 'slug', 'image', 'image_data', 'image_mime_type', 'category_id'])
+        $productsQuery = Product::select(['id', 'name', 'slug', 'image', 'category_id'])
             ->with([
                 'category:id,name',
                 'weightVariants' => function ($query) {
@@ -180,6 +186,11 @@ class PackController extends Controller
 
             // Gérer l'image principale si une nouvelle est uploadée
             if ($request->hasFile('main_image')) {
+                // Supprimer l'ancienne image si elle existe
+                if ($pack->main_image && Storage::disk('public')->exists($pack->main_image)) {
+                    Storage::disk('public')->delete($pack->main_image);
+                }
+
                 $imageData = $this->processMainImage($request->file('main_image'));
                 $data['main_image'] = $imageData['path'];
                 $data['main_image_data'] = $imageData['base64'];
@@ -188,6 +199,15 @@ class PackController extends Controller
 
             // Gérer la galerie d'images si de nouvelles sont uploadées
             if ($request->hasFile('gallery_images')) {
+                // Supprimer les anciennes images de la galerie
+                if ($pack->gallery_images && is_array($pack->gallery_images)) {
+                    foreach ($pack->gallery_images as $oldImage) {
+                        if (isset($oldImage['path']) && Storage::disk('public')->exists($oldImage['path'])) {
+                            Storage::disk('public')->delete($oldImage['path']);
+                        }
+                    }
+                }
+
                 $galleryImages = $this->processGalleryImages($request->file('gallery_images'));
                 $data['gallery_images'] = $galleryImages;
             }
@@ -223,12 +243,31 @@ class PackController extends Controller
         $this->authorize('delete', $pack);
 
         try {
+            DB::beginTransaction();
+
+            // Supprimer l'image principale si elle existe
+            if ($pack->main_image && Storage::disk('public')->exists($pack->main_image)) {
+                Storage::disk('public')->delete($pack->main_image);
+            }
+
+            // Supprimer les images de la galerie si elles existent
+            if ($pack->gallery_images && is_array($pack->gallery_images)) {
+                foreach ($pack->gallery_images as $image) {
+                    if (isset($image['path']) && Storage::disk('public')->exists($image['path'])) {
+                        Storage::disk('public')->delete($image['path']);
+                    }
+                }
+            }
+
             $pack->delete();
+
+            DB::commit();
 
             return redirect()->route('packs.index')
                 ->with('success', 'Pack supprimé avec succès.');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Erreur lors de la suppression du pack: ' . $e->getMessage());
         }
@@ -273,46 +312,43 @@ class PackController extends Controller
     }
 
     /**
-     * Traiter l'image principale et la convertir en base64
+     * Traiter l'image principale - sauvegarde sur disque uniquement (plus de base64)
      */
     private function processMainImage(UploadedFile $image): array
     {
-        // Sauvegarder l'image
-        $path = $image->store('packs', 'public');
+        // Utiliser le chemin configurable depuis .env
+        $path = config('app.pack_image_path', 'packs');
+        $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
-        // Convertir en base64
-        $imageContent = file_get_contents($image->getRealPath());
-        $base64 = base64_encode($imageContent);
-        $mimeType = $image->getMimeType();
+        // Sauvegarder l'image sur disque uniquement
+        $storedPath = $image->storeAs($path, $filename, 'public');
 
         return [
-            'path' => $path,
-            'base64' => $base64,
-            'mime_type' => $mimeType,
+            'path' => $storedPath,
+            'base64' => null,
+            'mime_type' => null,
         ];
     }
 
     /**
-     * Traiter les images de la galerie (max 5)
+     * Traiter les images de la galerie (max 5) - sauvegarde sur disque uniquement
      */
     private function processGalleryImages(array $images): array
     {
         $galleryData = [];
         $count = 0;
 
+        $basePath = config('app.pack_image_path', 'packs') . '/gallery';
+
         foreach ($images as $image) {
             if ($count >= 5) break; // Limite de 5 images
 
-            $path = $image->store('packs/gallery', 'public');
-            $imageContent = file_get_contents($image->getRealPath());
-            $base64 = base64_encode($imageContent);
-            $mimeType = $image->getMimeType();
+            $filename = time() . '_' . uniqid() . '_' . $count . '.' . $image->getClientOriginalExtension();
+            $storedPath = $image->storeAs($basePath, $filename, 'public');
 
             $galleryData[] = [
-                'path' => $path,
-                'base64' => $base64,
-                'mime_type' => $mimeType,
-                'url' => 'data:' . $mimeType . ';base64,' . $base64,
+                'path' => $storedPath,
+                'url' => asset('storage/' . $storedPath),
             ];
 
             $count++;

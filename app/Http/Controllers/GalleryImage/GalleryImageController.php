@@ -53,18 +53,32 @@ class GalleryImageController extends Controller
             $data['updated_by'] = Auth::id();
 
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageData = $this->convertImageToBase64($image);
-                $data['image'] = $this->handleImageUpload($image);
-                $data['image_data'] = $imageData['base64'];
-                $data['image_mime_type'] = $imageData['mime_type'];
+                $data['image'] = $this->handleImageUpload($request->file('image'));
+                // No more base64 storage for better performance
+                $data['image_data'] = null;
+                $data['image_mime_type'] = null;
             }
 
             GalleryImage::create($data);
 
             return redirect()->route('gallery-images.index')
                 ->with('success', 'Image ajoutée avec succès.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error storing gallery image: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erreur de base de données lors de l\'ajout. Veuillez réessayer.');
+
         } catch (\Exception $e) {
+            \Log::error('Error storing gallery image: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Erreur lors de l\'ajout de l\'image. Veuillez réessayer.');
@@ -98,20 +112,36 @@ class GalleryImageController extends Controller
                     Storage::disk('public')->delete($galleryImage->image);
                 }
 
-                // Save new image to database as base64
-                $image = $request->file('image');
-                $imageData = $this->convertImageToBase64($image);
-                $data['image'] = $this->handleImageUpload($image);
-                $data['image_data'] = $imageData['base64'];
-                $data['image_mime_type'] = $imageData['mime_type'];
+                // Save new image file only (no base64)
+                $data['image'] = $this->handleImageUpload($request->file('image'));
+                $data['image_data'] = null;
+                $data['image_mime_type'] = null;
             }
 
             $galleryImage->update($data);
 
             return redirect()->route('gallery-images.index')
                 ->with('success', 'Image mise à jour avec succès.');
-        } catch (\Exception $e) {
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error updating gallery image: ' . $e->getMessage(), [
+                'gallery_image_id' => $galleryImage->id,
+                'user_id' => Auth::id(),
+            ]);
+
             return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erreur de base de données lors de la mise à jour. Veuillez réessayer.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating gallery image: ' . $e->getMessage(), [
+                'gallery_image_id' => $galleryImage->id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
                 ->with('error', 'Erreur lors de la mise à jour de l\'image. Veuillez réessayer.');
         }
     }
@@ -133,7 +163,23 @@ class GalleryImageController extends Controller
 
             return redirect()->route('gallery-images.index')
                 ->with('success', 'Image supprimée avec succès.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error deleting gallery image: ' . $e->getMessage(), [
+                'gallery_image_id' => $galleryImage->id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Impossible de supprimer cette image. Elle est peut-être utilisée ailleurs.');
+
         } catch (\Exception $e) {
+            \Log::error('Error deleting gallery image: ' . $e->getMessage(), [
+                'gallery_image_id' => $galleryImage->id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return redirect()->back()
                 ->with('error', 'Erreur lors de la suppression de l\'image. Veuillez réessayer.');
         }
@@ -146,20 +192,5 @@ class GalleryImageController extends Controller
     {
         $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
         return $image->storeAs('gallery', $filename, 'public');
-    }
-
-    /**
-     * Convert an uploaded image to base64 for database storage.
-     */
-    private function convertImageToBase64(UploadedFile $image): array
-    {
-        $imageContent = file_get_contents($image->getRealPath());
-        $base64 = base64_encode($imageContent);
-        $mimeType = $image->getMimeType();
-
-        return [
-            'base64' => $base64,
-            'mime_type' => $mimeType,
-        ];
     }
 }

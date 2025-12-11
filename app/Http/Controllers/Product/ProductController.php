@@ -68,10 +68,32 @@ class ProductController extends Controller
             return redirect()->route('products.index')
                 ->with('success', 'Produit mis à jour avec succès.');
 
-        } catch (\Exception $e) {
-            return redirect()->back()       
-                     ->with('error', 'Erreur lors de la mise à jour du produit. Veuillez réessayer.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error updating product: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+            ]);
 
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erreur de base de données lors de la mise à jour. Veuillez réessayer.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Les données fournies ne sont pas valides.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating product: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erreur lors de la mise à jour du produit. Veuillez réessayer.');
         }
     }
 
@@ -89,7 +111,22 @@ class ProductController extends Controller
             return redirect()->route('products.index')
                 ->with('success', 'Produit supprimé avec succès.');
 
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error deleting product: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Impossible de supprimer ce produit. Il est peut-être utilisé dans des commandes.');
+
         } catch (\Exception $e) {
+            \Log::error('Error deleting product: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return redirect()->back()
                 ->with('error', 'Erreur lors de la suppression du produit. Veuillez réessayer.');
         }
@@ -112,9 +149,23 @@ class ProductController extends Controller
 
             return redirect()->route('products.index')->with('success', $message);
 
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error toggling featured status: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+            ]);
+
             return redirect()->back()
-                ->with('error', 'Erreur lors de la modification du statut du produit: ' . $e->getMessage());
+                ->with('error', 'Erreur de base de données lors de la modification du statut.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error toggling featured status: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la modification du statut du produit.');
         }
     }
 }

@@ -17,6 +17,8 @@ import {
     ChevronLeft,
     ChevronRight,
     X,
+    UserX,
+    UserCheck2,
 } from 'lucide-react';
 
 type Customer = {
@@ -25,6 +27,7 @@ type Customer = {
     email: string;
     phone: string | null;
     role: string;
+    is_active: boolean;
     created_at: string;
     created_at_human: string;
     orders_count: number;
@@ -126,6 +129,16 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
             style: 'currency',
             currency: 'TND',
         }).format(amount);
+    };
+
+    const toggleActiveStatus = (customer: Customer) => {
+        if (confirm(customer.is_active
+            ? `Êtes-vous sûr de vouloir désactiver le compte de ${customer.name} ?`
+            : `Êtes-vous sûr de vouloir activer le compte de ${customer.name} ?`)) {
+            router.patch(route('admin.customers.toggleActive', customer.id), {}, {
+                preserveScroll: true,
+            });
+        }
     };
 
     return (
@@ -310,6 +323,7 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-slate-900">Date d'inscription</th>
                                             <th className="px-6 py-3 text-center text-xs font-semibold text-slate-900">Commandes</th>
                                             <th className="px-6 py-3 text-right text-xs font-semibold text-slate-900">Total dépensé</th>
+                                            <th className="px-6 py-3 text-center text-xs font-semibold text-slate-900">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-200">
@@ -325,7 +339,14 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                                             customers.data.map((customer) => (
                                                 <tr key={customer.id} className="hover:bg-slate-50 transition-colors">
                                                     <td className="px-6 py-3">
-                                                        <div className="font-medium text-xs text-slate-900">{customer.name}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="font-medium text-xs text-slate-900">{customer.name}</div>
+                                                            {!customer.is_active && (
+                                                                <Badge variant="destructive" className="text-xs">
+                                                                    Désactivé
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-3">
                                                         <span className="text-xs text-slate-900">{customer.email}</span>
@@ -359,6 +380,29 @@ export default function CustomersIndex({ customers, filters: initialFilters, sta
                                                         <span className="text-xs font-semibold text-slate-900">
                                                             {formatCurrency(customer.total_spent)}
                                                         </span>
+                                                    </td>
+                                                    <td className="px-6 py-3">
+                                                        <div className="flex justify-center">
+                                                            <Button
+                                                                variant={customer.is_active ? "outline" : "default"}
+                                                                size="sm"
+                                                                onClick={() => toggleActiveStatus(customer)}
+                                                                className={customer.is_active ? "text-red-600 hover:text-red-700 hover:bg-red-50" : "bg-emerald-600 hover:bg-emerald-700"}
+                                                                title={customer.is_active ? "Désactiver le compte" : "Activer le compte"}
+                                                            >
+                                                                {customer.is_active ? (
+                                                                    <>
+                                                                        <UserX className="h-4 w-4 mr-1" />
+                                                                        Désactiver
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <UserCheck2 className="h-4 w-4 mr-1" />
+                                                                        Activer
+                                                                    </>
+                                                                )}
+                                                            </Button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))

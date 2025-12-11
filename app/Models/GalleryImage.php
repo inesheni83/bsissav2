@@ -51,19 +51,17 @@ class GalleryImage extends Model
     }
 
     /**
-     * Get the image URL. Returns base64 data URI if image_data exists,
-     * otherwise returns the file path (only if file exists).
+     * Get the image URL from the physical file path.
+     * No more base64 - images are stored on disk only for better performance.
      */
     public function getImageUrlAttribute(): ?string
     {
-        // Priority 1: Use base64 image from database if available
-        if ($this->image_data && $this->image_mime_type) {
-            return 'data:' . $this->image_mime_type . ';base64,' . $this->image_data;
-        }
+        // Use file path if available
+        if ($this->image) {
+            $normalizedPath = ltrim($this->image, '/');
 
-        // Priority 2: Use file path if available AND file exists
-        if ($this->image && \Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
+            // Return the public asset URL
+            return asset('storage/' . $normalizedPath);
         }
 
         return null;

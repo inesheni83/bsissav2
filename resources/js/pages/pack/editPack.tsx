@@ -68,6 +68,7 @@ type PageProps = {
 
 export default function EditPack({ pack, products }: PageProps) {
     const { errors: pageErrors = {} } = usePage<PageProps>().props;
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: pack.name,
         description: pack.description,
@@ -206,6 +207,9 @@ export default function EditPack({ pack, products }: PageProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
         const formDataToSend = new FormData();
         formDataToSend.append('_method', 'PUT');
         formDataToSend.append('name', formData.name);
@@ -235,7 +239,11 @@ export default function EditPack({ pack, products }: PageProps) {
             forceFormData: true,
             preserveState: (page) => Object.keys(page.props.errors || {}).length > 0,
             preserveScroll: (page) => Object.keys(page.props.errors || {}).length > 0,
+            onSuccess: () => {
+                setIsSubmitting(false);
+            },
             onError: (errors) => {
+                setIsSubmitting(false);
                 console.error('Validation errors:', errors);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             },
@@ -252,7 +260,7 @@ export default function EditPack({ pack, products }: PageProps) {
 
     return (
         <AppLayout>
-            <Head title={`Modifier ${pack.name}`} />
+            <Head title={`Modifier ${pack.name} - Administration`} />
 
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50">
                 <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -426,15 +434,19 @@ export default function EditPack({ pack, products }: PageProps) {
                                     <div className="relative inline-block">
                                         <img
                                             src={mainImagePreview}
-                                            alt="Aperçu"
+                                            alt={`Aperçu de l'image principale du pack ${pack.name}`}
+                                            width="192"
+                                            height="192"
+                                            loading="lazy"
                                             className="h-48 w-48 rounded-lg object-cover"
                                         />
                                         <button
                                             type="button"
                                             onClick={removeMainImage}
-                                            className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                                            aria-label="Supprimer l'image principale"
+                                            className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                         >
-                                            <X className="h-4 w-4" />
+                                            <X className="h-4 w-4" aria-hidden="true" />
                                         </button>
                                         <Button
                                             type="button"
@@ -449,9 +461,18 @@ export default function EditPack({ pack, products }: PageProps) {
                                 ) : (
                                     <div
                                         onClick={() => mainImageInputRef.current?.click()}
-                                        className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition-colors hover:border-emerald-500 hover:bg-emerald-50/50"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                mainImageInputRef.current?.click();
+                                            }
+                                        }}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-label="Cliquer pour ajouter une image principale"
+                                        className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition-colors hover:border-emerald-500 hover:bg-emerald-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                     >
-                                        <Upload className="h-12 w-12 text-slate-400" />
+                                        <Upload className="h-12 w-12 text-slate-400" aria-hidden="true" />
                                         <p className="mt-2 text-sm text-slate-600">
                                             Cliquez pour ajouter une image
                                         </p>
@@ -461,9 +482,10 @@ export default function EditPack({ pack, products }: PageProps) {
                                 <input
                                     ref={mainImageInputRef}
                                     type="file"
-                                    accept="image/jpeg,image/png,image/jpg"
+                                    accept="image/jpeg,image/png,image/jpg,image/webp"
                                     onChange={handleMainImageChange}
                                     className="hidden"
+                                    aria-label="Fichier image principale"
                                 />
                             </CardContent>
                         </Card>
@@ -485,7 +507,10 @@ export default function EditPack({ pack, products }: PageProps) {
                                                 <div key={`existing-${index}`} className="relative">
                                                     <img
                                                         src={image.url}
-                                                        alt={`Galerie ${index + 1}`}
+                                                        alt={`Image de galerie ${index + 1} du pack ${pack.name}`}
+                                                        width="96"
+                                                        height="96"
+                                                        loading="lazy"
                                                         className="h-24 w-24 rounded-lg object-cover"
                                                     />
                                                     <button
@@ -493,9 +518,10 @@ export default function EditPack({ pack, products }: PageProps) {
                                                         onClick={() =>
                                                             removeExistingGalleryImage(index)
                                                         }
-                                                        className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                                                        aria-label={`Supprimer l'image de galerie ${index + 1}`}
+                                                        className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                                     >
-                                                        <X className="h-3 w-3" />
+                                                        <X className="h-3 w-3" aria-hidden="true" />
                                                     </button>
                                                 </div>
                                             ))}
@@ -503,15 +529,19 @@ export default function EditPack({ pack, products }: PageProps) {
                                                 <div key={`new-${index}`} className="relative">
                                                     <img
                                                         src={preview}
-                                                        alt={`Nouvelle ${index + 1}`}
+                                                        alt={`Nouvelle image de galerie ${index + 1}`}
+                                                        width="96"
+                                                        height="96"
+                                                        loading="lazy"
                                                         className="h-24 w-24 rounded-lg object-cover"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => removeNewGalleryImage(index)}
-                                                        className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                                                        aria-label={`Supprimer la nouvelle image ${index + 1}`}
+                                                        className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                                     >
-                                                        <X className="h-3 w-3" />
+                                                        <X className="h-3 w-3" aria-hidden="true" />
                                                     </button>
                                                     <Badge
                                                         variant="secondary"
@@ -527,9 +557,18 @@ export default function EditPack({ pack, products }: PageProps) {
                                     {totalGalleryImages < 5 && (
                                         <div
                                             onClick={() => galleryInputRef.current?.click()}
-                                            className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition-colors hover:border-emerald-500 hover:bg-emerald-50/50"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    galleryInputRef.current?.click();
+                                                }
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label={`Ajouter des images à la galerie (${totalGalleryImages}/5)`}
+                                            className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition-colors hover:border-emerald-500 hover:bg-emerald-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                         >
-                                            <Upload className="h-8 w-8 text-slate-400" />
+                                            <Upload className="h-8 w-8 text-slate-400" aria-hidden="true" />
                                             <p className="mt-2 text-sm text-slate-600">
                                                 Ajouter des images ({totalGalleryImages}/5)
                                             </p>
@@ -539,10 +578,11 @@ export default function EditPack({ pack, products }: PageProps) {
                                     <input
                                         ref={galleryInputRef}
                                         type="file"
-                                        accept="image/jpeg,image/png,image/jpg"
+                                        accept="image/jpeg,image/png,image/jpg,image/webp"
                                         multiple
                                         onChange={handleGalleryImagesChange}
                                         className="hidden"
+                                        aria-label="Fichiers images de galerie"
                                     />
                                 </div>
                             </CardContent>
@@ -567,7 +607,10 @@ export default function EditPack({ pack, products }: PageProps) {
                                                 {item.product.image_url && (
                                                     <img
                                                         src={item.product.image_url}
-                                                        alt={item.product.name}
+                                                        alt={`Image du produit ${item.product.name}`}
+                                                        width="48"
+                                                        height="48"
+                                                        loading="lazy"
                                                         className="h-12 w-12 rounded-lg object-cover"
                                                     />
                                                 )}
@@ -602,9 +645,10 @@ export default function EditPack({ pack, products }: PageProps) {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => removeProduct(item.product_id)}
+                                                    aria-label={`Retirer ${item.product.name} du pack`}
                                                     className="text-red-600 hover:text-red-700"
                                                 >
-                                                    <X className="h-4 w-4" />
+                                                    <X className="h-4 w-4" aria-hidden="true" />
                                                 </Button>
                                             </div>
                                         ))}
@@ -654,7 +698,10 @@ export default function EditPack({ pack, products }: PageProps) {
                                                         {product.image_url && (
                                                             <img
                                                                 src={product.image_url}
-                                                                alt={product.name}
+                                                                alt={`Image du produit ${product.name}`}
+                                                                width="40"
+                                                                height="40"
+                                                                loading="lazy"
                                                                 className="h-10 w-10 rounded-lg object-cover"
                                                             />
                                                         )}
@@ -704,9 +751,10 @@ export default function EditPack({ pack, products }: PageProps) {
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                                disabled={isSubmitting}
+                                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Enregistrer les modifications
+                                {isSubmitting ? 'Enregistrement...' : 'Enregistrer les modifications'}
                             </Button>
                         </div>
                     </form>

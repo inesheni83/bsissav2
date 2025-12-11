@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\CustomerService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
@@ -32,6 +34,7 @@ class CustomerController extends Controller
                     'email' => $user->email,
                     'phone' => $user->phone,
                     'role' => $user->role,
+                    'is_active' => $user->is_active,
                     'created_at' => $user->created_at->format('d/m/Y'),
                     'created_at_human' => $user->created_at->diffForHumans(),
                     'orders_count' => $user->orders_count,
@@ -94,5 +97,38 @@ class CustomerController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Toggle customer active status.
+     */
+    public function toggleActive(User $user): RedirectResponse
+    {
+        try {
+            // Empêcher la désactivation de son propre compte
+            if ($user->id === auth()->id()) {
+                return redirect()->back()
+                    ->with('error', 'Vous ne pouvez pas désactiver votre propre compte.');
+            }
+
+            // Empêcher la désactivation d'un admin ou vendeur
+            if (in_array($user->role, ['admin', 'vendeur'])) {
+                return redirect()->back()
+                    ->with('error', 'Vous ne pouvez pas désactiver un compte administrateur ou vendeur.');
+            }
+
+            $user->is_active = !$user->is_active;
+            $user->save();
+
+            $message = $user->is_active
+                ? "Le compte de {$user->name} a été activé avec succès."
+                : "Le compte de {$user->name} a été désactivé avec succès.";
+
+            return redirect()->back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la modification du statut du compte.');
+        }
     }
 }

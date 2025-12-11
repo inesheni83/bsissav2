@@ -106,6 +106,7 @@ Route::middleware(['auth', 'admin.vendeur'])->group(function () {
     // Admin customers management routes
     Route::get('/admin/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
     Route::get('/admin/customers/export', [CustomerController::class, 'export'])->name('admin.customers.export');
+    Route::patch('/admin/customers/{user}/toggle-active', [CustomerController::class, 'toggleActive'])->name('admin.customers.toggleActive');
 
     // Admin site settings routes
     Route::get('/admin/settings/site', [SiteSettingsController::class, 'index'])->name('admin.settings.site');
