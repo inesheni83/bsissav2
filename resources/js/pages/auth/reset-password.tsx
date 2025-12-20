@@ -1,4 +1,4 @@
-import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController.ts';
+import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -16,27 +16,29 @@ interface ResetPasswordProps {
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     return (
         <AuthLayout
-            title="Reset password"
-            description="Please enter your new password below"
+            title="Réinitialisation du mot de passe"
+            description="Veuillez saisir votre nouveau mot de passe ci-dessous"
         >
-            <Head title="Reset password" />
+            <Head title="Réinitialisation du mot de passe" />
 
             <Form
-                {...NewPasswordController.store.form()}
+                action={NewPasswordController.store().url}
+                method="post"
                 transform={(data) => ({ ...data, token, email })}
                 resetOnSuccess={['password', 'password_confirmation']}
+                className="flex flex-col gap-6"
             >
                 {({ processing, errors }) => (
                     <div className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email" className='text-gray-900'>Email</Label>
                             <Input
                                 id="email"
                                 type="email"
                                 name="email"
                                 autoComplete="email"
                                 value={email}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full text-gray-900"
                                 readOnly
                             />
                             <InputError
@@ -46,30 +48,30 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password" className='text-gray-900'>Mot de passe</Label>
                             <Input
                                 id="password"
                                 type="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full text-gray-900"
                                 autoFocus
-                                placeholder="Password"
+                                placeholder="Mot de passe"
                             />
                             <InputError message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
+                            <Label htmlFor="password_confirmation" className='text-gray-900'>
+                                Confirmer le mot de passe
                             </Label>
                             <Input
                                 id="password_confirmation"
                                 type="password"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
+                                className="mt-1 block w-full text-gray-900"
+                                placeholder="Confirmer le mot de passe"
                             />
                             <InputError
                                 message={errors.password_confirmation}
@@ -86,7 +88,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             {processing && (
                                 <LoaderCircle className="h-4 w-4 animate-spin" />
                             )}
-                            Reset password
+                            Réinitialiser le mot de passe
                         </Button>
                     </div>
                 )}
